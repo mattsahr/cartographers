@@ -1,0 +1,677 @@
+
+html * {
+    box-sizing: border-box;
+}
+
+.page-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;            
+}
+
+
+.title-wrap {
+    padding: 1vw 5vw 2vw 5vw;
+    widtH: 90vw;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.title-wrap .letter {
+    font-size: 4vw;
+}
+
+.title-wrap .link {
+    width: 100%;
+    text-align: right;
+    font-size: 16px;
+    padding: 0.4vh 0 0 0;
+}
+
+.title-wrap .link a { 
+    text-decoration: none;
+    color: rgb(0, 240, 255);
+    text-transform: uppercase;
+    font-family: sans-serif;
+    font-weight: bold;
+    padding: 8px;
+    cursor: pointer;
+    border: solid 1px transparent;
+    margin: 6px 0;
+    border-radius: 2px;
+}
+
+.title-wrap .link a:hover {
+    border-color: rgb(0, 240, 255);
+    color: rgb(0, 140, 155);
+    background-color: rgb(200, 240, 255);
+}
+
+/* ========== A-B BOARD CHOOSER =========================== */
+
+.a-b-selector-wrap {
+    width: 24vw;
+    height: 7vw;
+    padding: 1vw 0 0 0;
+}
+
+.a-b-selector {
+    border: solid 1px rgb(120, 120, 120);
+    border-radius: 2px;
+    color: rgb(100, 100, 100);
+    display: flex;
+    width: 14vw;
+}
+
+.a-b-choice {
+    border: solid rgb(180, 180, 180);
+    background-color: rgb(250, 250, 250);
+    border-width: 0;
+    width: 50%;
+    height: 4.6vw;
+    padding: 0.6vw 0 0 0;
+    text-align: center;
+    font-size: 3vw;
+    cursor: pointer;
+}
+
+.a-b-choice:hover {
+    opacity: 0.7;
+}
+
+.a-b-choice.active {
+    background-color: rgb(255, 246, 160);
+    color: rgb(120, 70, 50);
+}
+
+.a-b-choice.choice-a {
+    border-width: 0 1px 0 0;
+}
+
+
+
+/* ========== TERRAIN CHOOSER =========================== */
+
+.terrain-wrap {
+    padding: 2vw 4vw;
+    width: 90vw;
+    height: 7vw;
+    display: flex;
+    justify-content: space-between;
+}
+
+.terrain-wrap .terrain-type {
+    position: relative;
+    cursor: pointer;
+    width: 7vw;
+    height: 7vw;
+    padding: 1.1vw;
+    border-radius: 7.5vw;
+}
+.terrain-wrap .terrain-type:hover {
+    opacity: 0.7;
+}
+
+.terrain-wrap .terrain-type .terrain-inner { 
+    height: 100%;
+    width: 100%;
+    border: solid 1px rgb(160, 160, 160);
+    position: relative;
+}
+
+.terrain-wrap .terrain-type.active {
+    background-color: rgb(255, 190, 0);
+}
+
+.terrain-wrap .terrain-type.terrain-ruins.active .terrain-inner {
+    border-color: rgba(250, 140, 70, 0.7);
+}
+
+.terrain-wrap .terrain-spacer {
+    border: none;
+    width: 1%;
+}
+
+/* ========== GOLD COINS =========================== */
+
+.gold-coins-wrap {
+    padding: 0vw 4vw 1vw 4vw;
+    width: 90vw;
+    display: flex;
+    flex-direction: row;
+}
+
+.gold-coin {
+    border: solid 1px rgb(160, 160, 160);
+    border-radius: 40px;
+    width: 5.8vw;
+    height: 5.4vw;
+    margin: 0.2vw;
+    padding: 0.5vw 0.5vw 0.5vw 0.4vw;
+    cursor: pointer;
+}
+
+.gold-coin .inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 40px;
+}
+
+.gold-coin.active .inner {
+    background: rgb(255,240,0);
+    background: radial-gradient(circle, rgb(255 240 0) 0%, rgb(255 198 5) 80%, rgb(160 110 0) 81%);
+}
+
+/* ========== MODAL SWITCH BOARDS WARNING =========================== */
+
+.modal-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    display: none;
+    background: rgba(250, 250, 250, 0.9);
+}
+
+.modal-panel.warn-a,
+.modal-panel.warn-b {
+    display: block;
+}
+
+.modal-warning {
+    margin: 20vw 10vw 0 10vw;
+    padding: 4vw 6vw 8vw 6vw;
+    font-size: 5vw;
+    background: rgb(250, 250, 250);
+    border-radius: 4vw;
+}
+
+.confirm-wrap {
+    width: 100%;
+    padding: 2vw 0 0 0;
+    text-align: center;
+}
+
+.confirm-inner {
+    display: none;
+    justify-content: center;
+}
+
+.modal-panel.warn-a .confirm-inner.confirm-a {
+    display: flex;
+}
+
+.modal-panel.warn-b .confirm-inner.confirm-b {
+    display: flex;
+}
+
+.modal-panel .message {
+    padding: 0 0 6vw 0;
+}
+
+.modal-panel .question {
+    padding: 0 0 1vw 0;
+    font-size: 0.8em;
+}
+
+.modal-panel .confirm-button {
+    opacity: 0.6;
+    cursor: pointer;
+    width: 12vw;
+    margin: 2vw;
+    padding: 1vw;
+    border-radius: 2vw;
+    background: rgb(255, 255, 255);
+    box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.1);
+    transition: opacity 200ms;
+}
+
+.modal-panel .confirm-button:hover {
+    opacity: 1;
+}
+
+/* ========== SCORE CARDS =========================== */
+
+.score-cards-wrap {
+    padding: 5vw 4vw 0 4vw;
+    width: 90vw;
+    display: flex;
+    flex-direction: row;
+    height: 14vw;
+}
+
+.score-card {
+    display: flex;
+    width: 20%;
+    margin: 0 2% 0 0;
+    height: 100%;
+    border-radius: 2px;
+    border: solid 2px rgb(120, 120, 120);
+    position: relative;
+}
+
+.score-card-title {
+    width: 100%;
+    position: absolute;
+    color: rgb( 190, 190, 190);
+    text-transform: uppercase;
+    font-size: 2vw;
+    top: -3.3vw;
+    letter-spacing: 0.1em;
+    padding: 4px;
+}
+
+.score-card-left {
+    width: 70%;
+    height: 100%;
+}
+
+.score-card-right {
+    width: 29%;
+    height: 100%;
+}
+
+.score-result {
+    font-size: 3vw;
+    text-align: right;
+    padding: 3vw 0.6vw 0 0;
+}
+
+.score-row {
+    width: 100%;
+    height: 50%;
+    display: flex;
+    border: solid rgb(180, 180, 180);
+    border-width: 0 3px 0 0;
+}
+
+.score-row.row-1 {
+    border-width: 0 3px 1px 0;
+}
+
+.score-field {
+    width: 50%;
+    height: 100%;
+}
+
+input.score-input {
+    width: 100%;
+    height: 100%;
+    padding: 0.3vw 0 0 0.5vw;
+    font-size: 2.2vw;
+    border: solid rgb(160, 170, 180);
+    border-width: 0 0 0 1px;
+    text-align: right;
+} 
+
+.final-score-card {
+    display: flex;
+    width: 11%;
+    margin: 0 0 0 1%;
+    height: 100%;
+    border-radius: 2px;
+    border: solid 2px rgb(120, 120, 120);
+    position: relative;
+}
+
+.final-score-result {
+    font-size: 4.2vw;
+    text-align: right;
+    padding: 2vw 0.8vw 0 0;
+    height: 100%;
+    width: 100%;
+    color: rgb(230, 70, 30);
+    font-weight: bold;
+}
+
+
+/* ============ GAME BOARD =========================== */
+
+.board-wrap {
+    padding: 4vw 4vw;
+    width: 90vw;
+    height: 90vw;
+    display: flex;
+    flex-direction: column;            
+}
+
+.row {
+    display: flex;
+    flex-direction: row;            
+    height: 8.3333%;
+}
+
+.row .cell {
+    width: 8.333%;
+    height: 100%;
+    border: solid 1px rgb(230, 230, 230);
+}
+
+.row .cell.no-corner {
+    border-left-width: 0;
+    border-bottom-width: 0;
+}
+
+.label, .number-label {
+    font-size: 2.6vw;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 7.4vw;
+    color: rgb(200, 220, 240);
+    font-family: sans-serif;
+}
+
+.game-square {
+    position: relative;
+    cursor: pointer;
+    background-color: rgb(245, 245, 245);
+    transition: opacity 160ms;
+}
+
+.game-square:hover {
+    opacity: 0.8;
+}
+
+.game-square.crevasse:hover,
+.game-square.mountain:hover {
+    cursor: default;
+    opacity: 1;
+}
+
+.game-square.forest, 
+.terrain-wrap .terrain-forest .terrain-inner {
+    font-size: 50px;
+    background-color: rgb(110, 205, 130);
+    background-image: repeating-radial-gradient( circle at 0.5em 0.5em, rgb(90, 195, 110), rgb(90, 195, 110) 0.1em, transparent 0.11em, transparent 0.45em, rgb(90, 195, 110) 0.46em);
+    background-size: 1em 1em;
+    background-position: 0.5em 0.5em;
+}
+
+.terrain-wrap .terrain-river .terrain-inner,
+.game-square.river {
+    background: radial-gradient(circle at 100% 50%, rgb(0 0 0 / 0%) 20%, rgba(255,255,255,.3) 21%, rgba(255,255,255,.3) 34%, rgb(0 0 0 / 0%) 35%, rgb(0 0 0 / 0%)), radial-gradient(circle at 0% 50%, rgb(0 0 0 / 0%) 20%, rgba(255,255,255,.3) 21%, rgba(255,255,255,.3) 34%, rgb(0 0 0 / 0%) 35%, rgb(0 0 0 / 0%)) 0 -6vw;
+    background-color: rgb(120 160 205);
+    background-size: 3vw 4vw;
+}
+
+.game-square.field, 
+.terrain-wrap .terrain-field .terrain-inner {
+    background-color: rgb(250, 190, 110);
+    background-image: repeating-linear-gradient(45deg, rgb(0 0 0 / 0%), rgb(0 0 0 / 0%) 15px, rgba(255,255,255,0.2) 15px, rgba(255,255,255,0.2) 26px);
+}
+
+.game-square.town, 
+.terrain-wrap .terrain-town .terrain-inner {
+    background:
+    linear-gradient(45deg, rgb(220, 100, 80) 45px, transparent 45px)64px 64px,
+    linear-gradient(45deg, rgb(220, 100, 80) 45px, transparent 45px,transparent 91px, rgb(200, 80, 60) 91px, rgb(200, 80, 60) 135px, transparent 135px),
+    linear-gradient(-45deg, rgb(220, 100, 80) 23px, transparent 23px, transparent 68px, rgb(220, 100, 80) 68px, rgb(220, 100, 80) 113px,transparent 113px,transparent 158px, rgb(220, 100, 80) 158px);
+    background-color:rgb(200, 80, 60);
+    background-size: 128px 128px;
+    
+    /*
+    background-color: rgb(220, 100, 80);
+*/
+}
+
+
+.game-square.crevasse, .terrain-wrap .terrain-crevasse .terrain-inner {
+    background-color: #6d695c;
+    background-image:
+    repeating-linear-gradient(120deg, rgba(255,255,255,.1), rgba(255,255,255,.1) 1px, transparent 1px, transparent 60px),
+    repeating-linear-gradient(60deg, rgba(255,255,255,.1), rgba(255,255,255,.1) 1px, transparent 1px, transparent 60px),
+    linear-gradient(60deg, rgba(0,0,0,.1) 25%, transparent 25%, transparent 75%, rgba(0,0,0,.1) 75%, rgba(0,0,0,.1)),
+    linear-gradient(120deg, rgba(0,0,0,.1) 25%, transparent 25%, transparent 75%, rgba(0,0,0,.1) 75%, rgba(0,0,0,.1));
+    background-size: 2vw 4vw;
+}
+.game-square.crevasse {
+    pointer: default;
+}
+
+.game-square.monster, .terrain-wrap .terrain-monster .terrain-inner {
+    background-color: rgb(180, 140, 240);
+}
+
+.terrain-ruins .terrain-inner::after {
+    background-image: url(ruins.svg);
+    background-size: 2.6vw 2.8vw;
+    display: inline-block;
+    width: 2.6vw;
+    height: 3vw;
+    content: "";
+    position: absolute;
+    top: 0.5vw;
+    left: 1.1vw;          
+}
+
+.game-square.ruins::after {
+    background-image: url(ruins2.svg);
+    background-size: 4.8vw 5vw;
+    display: inline-block;
+    width: 4.8vw;
+    height: 5.1vw;
+    content: "";
+    position: absolute;
+    top: 0.9vw;
+    left: 0.9vw;
+    opacity: 0.2;     
+}
+
+.mountain,
+.terrain-mountain {
+    background-color: rgb(190, 180, 160);
+}
+
+.terrain-mountain .terrain-inner::after {
+    background-image: url(mountain.svg);
+    background-size: 3.5vw 3.4vw;
+    display: inline-block;
+    width: 3.6vw;
+    height: 3.2vw;
+    content: "";
+    position: absolute;
+    top: 0.1vw;
+    left: 0.6vw;
+    opacity: 0.6;       
+}
+
+.game-square.mountain::after {
+    background-image: url(mountain.svg);
+    background-size: 5.3vw 5vw;
+    display: inline-block;
+    width: 5.3vw;
+    height: 5.2vw;
+    content: "";
+    position: absolute;
+    top: 0.6vw;
+    left: 0.7vw;
+    opacity: 0.4;      
+}
+
+.terrain-wrap .terrain-monster .terrain-inner::before {
+    background-image: url(monster.svg);
+    background-size: 3.5vw 3.4vw;
+    display: inline-block;
+    width: 3.6vw;
+    height: 3.2vw;
+    content: "";
+    position: absolute;
+    top: 0.5vw;
+    left: 0.6vw;
+    opacity: 0.6;       
+}
+.game-square.monster::before {
+    background-image: url(monster.svg);
+    background-size: 5.5vw 5.4vw;
+    display: inline-block;
+    width: 5.6vw;
+    height: 5.2vw;
+    content: "";
+    position: absolute;
+    top: 0.6vw;
+    left: 0.7vw;
+    opacity: 0.3;    
+}
+
+
+.terrain-mountain, .terrain-crevasse, .terrain-ruins {
+    display: none;
+}
+
+
+.setup-mode .terrain-mountain, .setup-mode .terrain-crevasse, .setup-mode .terrain-ruins {
+    display: block;
+}
+
+/* =============== RESPONSIVE ======================= */
+
+
+@media only screen and (max-width: 767px) {
+
+    .terrain-wrap {
+        padding: 2vw 0 8vw 0;
+        width: 98vw;
+    }
+    
+    .terrain-wrap .terrain-type {
+        width: 10vw;
+        height: 10vw;
+        padding: 1.4vw;
+    }
+    
+    .terrain-wrap .terrain-monster .terrain-inner::before {
+        background-size: 5.5vw 5.4vw;
+        width: 5.6vw;
+        height: 5.2vw;
+        top: 0.7vw;
+        left: 0.8vw;
+    }
+
+    .board-wrap {
+        padding: 4vw 0vw;
+        width: 98vw;
+        height: 98vw;
+    }
+    
+    
+    .game-square.monster::before {
+        background-size: 5.8vw 5.7vw;
+        width: 5.8vw;
+        height: 5.7vw;
+        top: 0.6vw;
+        left: 1.1vw;
+    }
+    
+    .game-square.mountain::after {
+        background-size: 5.8vw 5.8vw;
+        width: 5.8vw;
+        height: 5.8vw;
+        top: 0.6vw;
+        left: 1vw;
+    }
+    
+    .game-square.ruins::after {
+        top: 1.1vw;
+        left: 1.4vw;
+    }
+
+    .gold-coins-wrap {
+        padding: 2vw 0vw 3vw 1vw;
+        width: 96vw;
+    }
+    
+    .gold-coin {
+        width: 6.8vw;
+        height: 6vw;
+    }
+
+    .score-cards-wrap {
+        flex-wrap: wrap;
+        height: inherit;
+        justify-content: space-between;
+        padding: 5vw 0 0 0;
+        width: 96vw;
+    }
+
+    .score-card {
+        display: flex;
+        width: 48%;
+        margin: 0 0 8vw 0;
+        height: 18vw;
+        border-width: 1px;
+    }
+    
+    input.score-input {
+        padding: 0.6vw 0 0 0.5vw;
+        font-size: 3.5vw;
+    }
+    
+    .score-result {
+    font-size: 6vw;
+    }
+    
+    .final-score-card {
+        width: 70vw;
+        height: 14vw;
+        border-width: 1px;
+    }
+
+    .final-score-result {
+        padding: 3vw 3vw 0 0;
+        font-size: 8vw;
+    }
+}
+
+
+/* ======= ispin.js library ========================= */
+
+.ispin-wrapper {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  padding: 0;
+  vertical-align: middle
+}
+.ispin-wrapper .ispin-button {
+    position: absolute;
+    display: block;
+    height: 50%;
+    min-height: 0;
+    min-width: 0;
+    width: 30px;
+    padding: 0;
+    margin: 0;
+    right: 0;
+    border: none;
+    background: none;
+    cursor: pointer
+  }
+.ispin-wrapper .ispin-button:before {
+      content: '';
+      display: inline-block;
+      -webkit-transform: translateY(-50%);
+              transform: translateY(-50%);
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+    }
+.ispin-wrapper .ispin-button.ispin-button-inc {
+      top: 0
+    }
+.ispin-wrapper .ispin-button.ispin-button-inc:before {
+        border-bottom: 5px solid black;
+      }
+.ispin-wrapper .ispin-button.ispin-button-inc:disabled:before {
+        border-bottom-color: grey;
+      }
+.ispin-wrapper .ispin-button.ispin-button-dec {
+      bottom: 0
+    }
+.ispin-wrapper .ispin-button.ispin-button-dec:before {
+        border-top: 5px solid black;
+      }
+.ispin-wrapper .ispin-button.ispin-button-dec:disabled:before {
+        border-top-color: grey;
+      }
