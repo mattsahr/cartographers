@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Cartographers</title>
+    <meta charset="utf-8"/>
+    <style>
+        
+        html * {
+            box-sizing: border-box;
+        }
+        
+        .page-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;            
+        }
+        
+        
+        .title-wrap {
+            padding: 1vw 5vw 2vw 5vw;
+            widtH: 90vw;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        
+        .title-wrap .letter {
+            font-size: 4vw;
+        }
+        
+        .title-wrap .link {
+            width: 100%;
+            text-align: right;
+            font-size: 16px;
+            padding: 0.4vh 0 0 0;
+        }
+        
+        .title-wrap .link a { 
+            text-decoration: none;
+            color: rgb(0, 240, 255);
+            text-transform: uppercase;
+            font-family: sans-serif;
+            font-weight: bold;
+            padding: 8px;
+            cursor: pointer;
+            border: solid 1px transparent;
+            margin: 6px 0;
+            border-radius: 2px;
+        }
+        
+        .title-wrap .link a:hover {
+            border-color: rgb(0, 240, 255);
+            color: rgb(0, 140, 155);
+            background-color: rgb(200, 240, 255);
+        }
+        
+        /* ========== A-B BOARD CHOOSER =========================== */
+
+        .a-b-selector-wrap {
+            width: 24vw;
+            height: 7vw;
+            padding: 1vw 0 0 0;
+        }
+        
+        .a-b-selector {
+            border: solid 1px rgb(120, 120, 120);
+            border-radius: 2px;
+            color: rgb(100, 100, 100);
+            display: flex;
+            width: 14vw;
+        }
+        
+        .a-b-choice {
+            border: solid rgb(180, 180, 180);
+            background-color: rgb(250, 250, 250);
+            border-width: 0;
+            width: 50%;
+            height: 4.6vw;
+            padding: 0.6vw 0 0 0;
+            text-align: center;
+            font-size: 3vw;
+            cursor: pointer;
+        }
+        
+        .a-b-choice:hover {
+            opacity: 0.7;
+        }
+        
+        .a-b-choice.active {
+            background-color: rgb(255, 246, 160);
+            color: rgb(120, 70, 50);
+        }
+        
+        .a-b-choice.choice-a {
+            border-width: 0 1px 0 0;
+        }
+        
+        
+        
+        /* ========== TERRAIN CHOOSER =========================== */
+
+        .terrain-wrap {
+            padding: 2vw 4vw;
+            width: 90vw;
+            height: 7vw;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .terrain-wrap .terrain-type {
+            position: relative;
+            cursor: pointer;
+            width: 7vw;
+            height: 7vw;
+            padding: 1.1vw;
+            border-radius: 7.5vw;
+        }
+        .terrain-wrap .terrain-type:hover {
+            opacity: 0.7;
+        }
+        
+        .terrain-wrap .terrain-type .terrain-inner { 
+            height: 100%;
+            width: 100%;
+            border: solid 1px rgb(160, 160, 160);
+            position: relative;
+        }
+
+        .terrain-wrap .terrain-type.active {
+            background-color: rgb(255, 190, 0);
+        }
+        
+        .terrain-wrap .terrain-type.terrain-ruins.active .terrain-inner {
+            border-color: rgba(250, 140, 70, 0.7);
+        }
+        
+        .terrain-wrap .terrain-spacer {
+            border: none;
+            width: 1%;
+        }
+        
+        /* ========== GOLD COINS =========================== */
+        
+        .gold-coins-wrap {
+            padding: 0vw 4vw 1vw 4vw;
+            width: 90vw;
+            display: flex;
+            flex-direction: row;
+        }
+        
+        .gold-coin {
+            border: solid 1px rgb(160, 160, 160);
+            border-radius: 40px;
+            width: 5.8vw;
+            height: 5.4vw;
+            margin: 0.2vw;
+            padding: 0.5vw 0.5vw 0.5vw 0.4vw;
+            cursor: pointer;
+        }
+        
+        .gold-coin .inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 40px;
+        }
+        
+        .gold-coin.active .inner {
+            background: rgb(255,240,0);
+            background: radial-gradient(circle, rgb(255 240 0) 0%, rgb(255 198 5) 80%, rgb(160 110 0) 81%);
+        }
+
+        /* ========== MODAL SWITCH BOARDS WARNING =========================== */
+
+        .modal-panel {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+            display: none;
+            background: rgba(250, 250, 250, 0.9);
+        }
+        
+        .modal-panel.warn-a,
+        .modal-panel.warn-b {
+            display: block;
+        }
+        
+        .modal-warning {
+            margin: 20vw 10vw 0 10vw;
+            padding: 4vw 6vw 8vw 6vw;
+            font-size: 5vw;
+            background: rgb(250, 250, 250);
+            border-radius: 4vw;
+        }
+        
+        .confirm-wrap {
+            width: 100%;
+            padding: 2vw 0 0 0;
+            text-align: center;
+        }
+        
+        .confirm-inner {
+            display: none;
+            justify-content: center;
+        }
+        
+        .modal-panel.warn-a .confirm-inner.confirm-a {
+            display: flex;
+        }
+
+        .modal-panel.warn-b .confirm-inner.confirm-b {
+            display: flex;
+        }
+        
+        .modal-panel .message {
+            padding: 0 0 6vw 0;
+        }
+        
+        .modal-panel .question {
+            padding: 0 0 1vw 0;
+            font-size: 0.8em;
+        }
+        
+        .modal-panel .confirm-button {
+            opacity: 0.6;
+            cursor: pointer;
+            width: 12vw;
+            margin: 2vw;
+            padding: 1vw;
+            border-radius: 2vw;
+            background: rgb(255, 255, 255);
+            box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.1);
+            transition: opacity 200ms;
+        }
+        
+        .modal-panel .confirm-button:hover {
+            opacity: 1;
+        }
+
+        /* ========== SCORE CARDS =========================== */
+
+        .score-cards-wrap {
+            padding: 5vw 4vw 0 4vw;
+            width: 90vw;
+            display: flex;
+            flex-direction: row;
+            height: 14vw;
+        }
+        
+        .score-card {
+            display: flex;
+            width: 20%;
+            margin: 0 2% 0 0;
+            height: 100%;
+            border-radius: 2px;
+            border: solid 2px rgb(120, 120, 120);
+            position: relative;
+        }
+        
+        .score-card-title {
+            width: 100%;
+            position: absolute;
+            color: rgb( 190, 190, 190);
+            text-transform: uppercase;
+            font-size: 2vw;
+            top: -3.3vw;
+            letter-spacing: 0.1em;
+            padding: 4px;
+        }
+        
+        .score-card-left {
+            width: 70%;
+            height: 100%;
+        }
+        
+        .score-card-right {
+            width: 29%;
+            height: 100%;
+        }
+        
+        .score-result {
+            font-size: 3vw;
+            text-align: right;
+            padding: 3vw 0.6vw 0 0;
+        }
+        
+        .score-row {
+            width: 100%;
+            height: 50%;
+            display: flex;
+            border: solid rgb(180, 180, 180);
+            border-width: 0 3px 0 0;
+        }
+        
+        .score-row.row-1 {
+            border-width: 0 3px 1px 0;
+        }
+        
+        .score-field {
+            width: 50%;
+            height: 100%;
+        }
+        
+        input.score-input {
+            width: 100%;
+            height: 100%;
+            padding: 0.3vw 0 0 0.5vw;
+            font-size: 2.2vw;
+            border: solid rgb(160, 170, 180);
+            border-width: 0 0 0 1px;
+            text-align: right;
+        } 
+        
+        .final-score-card {
+            display: flex;
+            width: 11%;
+            margin: 0 0 0 1%;
+            height: 100%;
+            border-radius: 2px;
+            border: solid 2px rgb(120, 120, 120);
+            position: relative;
+        }
+        
+        .final-score-result {
+            font-size: 4.2vw;
+            text-align: right;
+            padding: 2vw 0.8vw 0 0;
+            height: 100%;
+            width: 100%;
+            color: rgb(230, 70, 30);
+            font-weight: bold;
+        }
+        
+        /* ============ GAME BOARD =========================== */
+
+        .board-wrap {
+            padding: 4vw 4vw;
+            width: 90vw;
+            height: 90vw;
+            display: flex;
+            flex-direction: column;            
+        }
+        
+        .row {
+            display: flex;
+            flex-direction: row;            
+            height: 8.3333%;
+        }
+        
+        .row .cell {
+            width: 8.333%;
+            height: 100%;
+            border: solid 1px rgb(230, 230, 230);
+        }
+        
+        .row .cell.no-corner {
+            border-left-width: 0;
+            border-bottom-width: 0;
+        }
+        
+        .label, .number-label {
+            font-size: 2.6vw;
+            text-align: center;
+            vertical-align: middle;
+            line-height: 7.4vw;
+            color: rgb(200, 220, 240);
+            font-family: sans-serif;
+        }
+        
+        .game-square {
+            position: relative;
+            cursor: pointer;
+            background-color: rgb(245, 245, 245);
+            transition: opacity 160ms;
+        }
+        
+        .game-square:hover {
+            opacity: 0.8;
+        }
+        
+        .game-square.crevasse:hover,
+        .game-square.mountain:hover {
+            cursor: default;
+            opacity: 1;
+        }
+
+        .game-square.forest, 
+        .terrain-wrap .terrain-forest .terrain-inner {
+            font-size: 50px;
+            background-color: rgb(110, 205, 130);
+            background-image: repeating-radial-gradient( circle at 0.5em 0.5em, rgb(90, 195, 110), rgb(90, 195, 110) 0.1em, transparent 0.11em, transparent 0.45em, rgb(90, 195, 110) 0.46em);
+            background-size: 1em 1em;
+            background-position: 0.5em 0.5em;
+        }
+
+        .terrain-wrap .terrain-river .terrain-inner,
+        .game-square.river {
+            background: radial-gradient(circle at 100% 50%, rgb(0 0 0 / 0%) 20%, rgba(255,255,255,.3) 21%, rgba(255,255,255,.3) 34%, rgb(0 0 0 / 0%) 35%, rgb(0 0 0 / 0%)), radial-gradient(circle at 0% 50%, rgb(0 0 0 / 0%) 20%, rgba(255,255,255,.3) 21%, rgba(255,255,255,.3) 34%, rgb(0 0 0 / 0%) 35%, rgb(0 0 0 / 0%)) 0 -6vw;
+            background-color: rgb(120 160 205);
+            background-size: 3vw 4vw;
+        }
+        
+        .game-square.field, 
+        .terrain-wrap .terrain-field .terrain-inner {
+            background-color: rgb(250, 190, 110);
+            background-image: repeating-linear-gradient(45deg, rgb(0 0 0 / 0%), rgb(0 0 0 / 0%) 15px, rgba(255,255,255,0.2) 15px, rgba(255,255,255,0.2) 26px);
+        }
+        
+        .game-square.town, 
+        .terrain-wrap .terrain-town .terrain-inner {
+            background:
+            linear-gradient(45deg, rgb(220, 100, 80) 45px, transparent 45px)64px 64px,
+            linear-gradient(45deg, rgb(220, 100, 80) 45px, transparent 45px,transparent 91px, rgb(200, 80, 60) 91px, rgb(200, 80, 60) 135px, transparent 135px),
+            linear-gradient(-45deg, rgb(220, 100, 80) 23px, transparent 23px, transparent 68px, rgb(220, 100, 80) 68px, rgb(220, 100, 80) 113px,transparent 113px,transparent 158px, rgb(220, 100, 80) 158px);
+            background-color:rgb(200, 80, 60);
+            background-size: 128px 128px;
+            
+            /*
+            background-color: rgb(220, 100, 80);
+*/
+        }
+        
+        
+        .game-square.crevasse, .terrain-wrap .terrain-crevasse .terrain-inner {
+            background-color: #6d695c;
+            background-image:
+            repeating-linear-gradient(120deg, rgba(255,255,255,.1), rgba(255,255,255,.1) 1px, transparent 1px, transparent 60px),
+            repeating-linear-gradient(60deg, rgba(255,255,255,.1), rgba(255,255,255,.1) 1px, transparent 1px, transparent 60px),
+            linear-gradient(60deg, rgba(0,0,0,.1) 25%, transparent 25%, transparent 75%, rgba(0,0,0,.1) 75%, rgba(0,0,0,.1)),
+            linear-gradient(120deg, rgba(0,0,0,.1) 25%, transparent 25%, transparent 75%, rgba(0,0,0,.1) 75%, rgba(0,0,0,.1));
+            background-size: 2vw 4vw;
+        }
+        .game-square.crevasse {
+            pointer: default;
+        }
+        
+        .game-square.monster, .terrain-wrap .terrain-monster .terrain-inner {
+            background-color: rgb(180, 140, 240);
+        }
+        
+        .terrain-ruins .terrain-inner::after {
+            background-image: url(ruins.svg);
+            background-size: 2.6vw 2.8vw;
+            display: inline-block;
+            width: 2.6vw;
+            height: 3vw;
+            content: "";
+            position: absolute;
+            top: 0.5vw;
+            left: 1.1vw;          
+        }
+
+        .game-square.ruins::after {
+            background-image: url(ruins2.svg);
+            background-size: 4.8vw 5vw;
+            display: inline-block;
+            width: 4.8vw;
+            height: 5.1vw;
+            content: "";
+            position: absolute;
+            top: 0.9vw;
+            left: 0.9vw;
+            opacity: 0.2;     
+        }
+
+        .mountain,
+        .terrain-mountain {
+            background-color: rgb(190, 180, 160);
+        }
+
+        .terrain-mountain .terrain-inner::after {
+            background-image: url(mountain.svg);
+            background-size: 3.5vw 3.4vw;
+            display: inline-block;
+            width: 3.6vw;
+            height: 3.2vw;
+            content: "";
+            position: absolute;
+            top: 0.1vw;
+            left: 0.6vw;
+            opacity: 0.6;       
+        }
+
+        .game-square.mountain::after {
+            background-image: url(mountain.svg);
+            background-size: 5.3vw 5vw;
+            display: inline-block;
+            width: 5.3vw;
+            height: 5.2vw;
+            content: "";
+            position: absolute;
+            top: 0.6vw;
+            left: 0.7vw;
+            opacity: 0.4;      
+        }
+        
+        .terrain-wrap .terrain-monster .terrain-inner::before {
+            background-image: url(monster.svg);
+            background-size: 3.5vw 3.4vw;
+            display: inline-block;
+            width: 3.6vw;
+            height: 3.2vw;
+            content: "";
+            position: absolute;
+            top: 0.5vw;
+            left: 0.6vw;
+            opacity: 0.6;       
+        }
+        .game-square.monster::before {
+            background-image: url(monster.svg);
+            background-size: 5.5vw 5.4vw;
+            display: inline-block;
+            width: 5.6vw;
+            height: 5.2vw;
+            content: "";
+            position: absolute;
+            top: 0.6vw;
+            left: 0.7vw;
+            opacity: 0.3;    
+        }
+        
+        
+        .terrain-mountain, .terrain-crevasse, .terrain-ruins {
+            display: none;
+        }
+        
+        
+        .setup-mode .terrain-mountain, .setup-mode .terrain-crevasse, .setup-mode .terrain-ruins {
+            display: block;
+        }
+
+    </style>
+    
+    <script type="text/javascript">
+        
+        var currentTerrain = 'forest';
+        var currentPlayBoard = 'A';
+        var gameBoardStarted = false;
+        
+        var playTerrains = [ 'forest', 'town', 'river', 'field', 'monster' ];
+        
+        var dismissModal = function() {
+            document.querySelectorAll('.modal-panel').forEach(function (panel) {
+                panel.classList.remove('warn-a');
+                panel.classList.remove('warn-b');
+            });
+        };
+        
+        var initBoardSwitcher = function() {
+            
+            var confirmA = function() {
+                if (currentPlayBoard !== 'A') {
+                    if (gameBoardStarted) {
+                        document.querySelectorAll('.modal-panel').forEach(function (panel) {
+                            panel.classList.remove('warn-b');
+                            panel.classList.add('warn-a');
+                        });
+                    } else {
+                        setupA();
+                    }
+                }
+            };
+            
+            var confirmB = function() {
+                if (currentPlayBoard !== 'B') {
+                    if (gameBoardStarted) {
+                        document.querySelectorAll('.modal-panel').forEach(function (panel) {
+                            panel.classList.remove('warn-a');
+                            panel.classList.add('warn-b');
+                        });
+                    } else {
+                        setupB();
+                    }
+                }
+            };
+            
+
+            var chooseA = document.getElementById('selector-choice-a');
+            var chooseB = document.getElementById('selector-choice-b');
+            
+            chooseA.addEventListener('click', confirmA);
+            chooseB.addEventListener('click', confirmB);
+            
+            document.querySelectorAll('.confirm-inner.confirm-a .confirm-button.yes').forEach(function (yesA) {
+                yesA.addEventListener('click', setupA);
+            });
+            
+            document.querySelectorAll('.confirm-inner.confirm-b .confirm-button.yes').forEach(function (yesB) {
+                yesB.addEventListener('click', setupB);
+            });
+            
+            document.querySelectorAll('.confirm-inner .confirm-button.no').forEach(function (noButton) {
+                noButton.addEventListener('click', dismissModal);
+            });
+
+        };
+        
+        var initScoreCards = function() {
+            var scoreKeeper = {
+                'final': function () {
+                    var score = 0;
+                    var localScore = 0;
+                    document.querySelectorAll('.score-result').forEach(function(result) {
+                        localScore = result.getAttribute('data-score');
+                        score += localScore ? Number(localScore) : 0;
+                    });
+                    
+                    var final = document.getElementById('final-score');
+                    final.innerHTML = score;
+                },
+                calc: function (season) {
+                    gameBoardStarted = true;
+                    var score = 0;
+                     document.querySelectorAll('#score-card-' + season + ' .score-input').forEach(function(input) {
+                         score += input.value ? Number(input.value) : 0;
+                     });
+                    document.querySelectorAll('#score-card-' + season + ' .score-result').forEach(function(result) {
+                        result.innerHTML = score;
+                        result.setAttribute("data-score", score);
+                    });
+                    scoreKeeper.final();
+                }
+            }
+        
+            document.querySelectorAll('.score-card').forEach(function(card) {
+                var season = card.getAttribute('data-season');
+                card.querySelectorAll('.score-input').forEach(function(input){
+                    input.addEventListener('change', function() {
+                        scoreKeeper.calc(season);
+                    });
+                });
+                
+            });
+        };
+        
+        var initTerrainSwitcher = function () {
+            document.querySelectorAll('.terrain-type').forEach(function(el){
+                el.addEventListener('click', function() {
+                    document.querySelectorAll('.terrain-type').forEach(function(item){ item.classList.remove('active')});
+                    this.classList.add('active');
+                    currentTerrain = this.getAttribute('data-terrain');
+                });
+            });
+        };
+        
+        var initGameBoard = function () {
+            document.querySelectorAll('.game-square').forEach(function(el){
+                el.addEventListener('click', function() {
+                    
+                    if (!this.classList.contains('mountain') && !this.classList.contains('crevasse')) { 
+                        
+                        gameBoardStarted = true;
+
+                        for (var i = 0; i < playTerrains.length; i++) {
+                            var terrain = playTerrains[i];
+                            
+                            if (terrain === currentTerrain) {
+                                if (this.classList.contains(terrain)) {
+                                    this.classList.remove(terrain);
+                                } else {
+                                    this.classList.add(terrain);
+                                }
+                            } else {
+                                this.classList.remove(terrain);
+                            }
+                        }
+
+                    }
+                });
+            });
+        };
+        
+        var initGoldCoinTracker = function () {
+            document.querySelectorAll('.gold-coin').forEach(function(el){
+                el.addEventListener('click', function() {
+                    gameBoardStarted = true;
+                    if (this.classList.contains('active')) { 
+                        this.classList.remove('active');
+                    } else {
+                        this.classList.add('active');
+                    }
+                });
+            });
+        };
+        
+        var gameInit = function() {
+            initTerrainSwitcher();
+            initGameBoard();
+            initGoldCoinTracker();
+            initScoreCards();
+            initBoardSwitcher();
+        };
+        
+        var clearScoreCards = function() {
+             document.querySelectorAll('.score-input').forEach(function(input) {
+                 input.value = undefined;
+             });
+            document.querySelectorAll('.score-result').forEach(function(result) {
+                result.innerHTML = '';
+                result.setAttribute("data-score", 0);
+            });
+            var final = document.getElementById('final-score');
+            final.innerHTML = '';
+
+            
+            document.querySelectorAll('.gold-coin').forEach(function(coin) {
+                coin.classList.remove('active');
+            });
+        };
+        
+        var setupA = function() {
+
+            var chooseA = document.getElementById('selector-choice-a');
+            var chooseB = document.getElementById('selector-choice-b');
+            chooseA.classList.add('active');
+            chooseB.classList.remove('active');
+            currentPlayBoard = 'A';
+            gameBoardStarted = false;
+            clearScoreCards();
+            dismissModal();
+
+            var mountainCells = [
+                'row_b_cell_4',
+                'row_c_cell_9',
+                'row_f_cell_6',
+                'row_i_cell_3',
+                'row_j_cell_8',
+            ]
+            var ruinsCells = [
+                'row_b_cell_6',
+                'row_c_cell_2',
+                'row_c_cell_10',
+                'row_i_cell_2',
+                'row_i_cell_10',
+                'row_j_cell_6',
+            ]
+            
+            var i, id, el;
+            var allTerrains = [ 'forest', 'field', 'river', 'town', 'mountain', 'monster', 'ruins', 'crevasse'];
+
+            document.querySelectorAll('.game-square').forEach(function(el){
+                for (i = 0; i < allTerrains.length; i++) {
+                    el.classList.remove(allTerrains[i]);
+                }
+            });            
+            
+            for (i = 0; i < mountainCells.length; i++) {
+                id = mountainCells[i];
+                el = document.getElementById(id);
+                el.classList.add('mountain');
+            }
+            
+            for (i = 0; i < ruinsCells.length; i++) {
+                id = ruinsCells[i];
+                el = document.getElementById(id);
+                el.classList.add('ruins');
+            }
+        }
+        
+        var setupB = function() {
+
+            var chooseA = document.getElementById('selector-choice-a');
+            var chooseB = document.getElementById('selector-choice-b');
+
+            chooseA.classList.remove('active');
+            chooseB.classList.add('active');
+            currentPlayBoard = 'B';
+            gameBoardStarted = false;
+            clearScoreCards();
+            dismissModal();
+
+            var mountainCells = [
+                'row_b_cell_9',
+                'row_c_cell_4',
+                'row_h_cell_6',
+                'row_i_cell_10',
+                'row_j_cell_3'
+            ]
+            var ruinsCells = [
+                'row_b_cell_7',
+                'row_c_cell_3',
+                'row_e_cell_7',
+                'row_g_cell_2',
+                'row_h_cell_9',
+                'row_j_cell_4'
+            ]
+            
+            var crevasseCells = [
+                'row_d_cell_6',
+                'row_e_cell_5',
+                'row_e_cell_6',
+                'row_f_cell_5',
+                'row_f_cell_6',
+                'row_f_cell_7',
+                'row_g_cell_6'
+            ]
+            
+            var i, id, el;
+            var allTerrains = [ 'forest', 'field', 'river', 'town', 'mountain', 'monster', 'ruins', 'crevasse' ];
+
+            document.querySelectorAll('.game-square').forEach(function(el){
+                for (i = 0; i < allTerrains.length; i++) {
+                    el.classList.remove(allTerrains[i]);
+                }
+            });            
+            
+            for (i = 0; i < mountainCells.length; i++) {
+                id = mountainCells[i];
+                el = document.getElementById(id);
+                el.classList.add('mountain');
+            }
+            
+            for (i = 0; i < ruinsCells.length; i++) {
+                id = ruinsCells[i];
+                el = document.getElementById(id);
+                el.classList.add('ruins');
+            }
+
+            for (i = 0; i < crevasseCells.length; i++) {
+                id = crevasseCells[i];
+                el = document.getElementById(id);
+                el.classList.add('crevasse');
+            }
+
+        }
+        
+        
+        window.addEventListener('DOMContentLoaded', (event) => {
+            gameInit();
+            setupA();
+        });
+    </script>
+</head>
+
+<body>
+
+    <div class="modal-panel">
+        <div class="modal-warning">
+            <div class="message">Switching board types will erase your game.</div>
+            <div class="question">Switch boards?</div>
+            <div class="confirm-wrap">
+                <div class="confirm-inner confirm-a">
+                    <div class="confirm-button yes">Yes</div>
+                    <div class="confirm-button no">No</div>
+                </div>
+                <div class="confirm-inner confirm-b">
+                    <div class="confirm-button yes">Yes</div>
+                    <div class="confirm-button no">No</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+	<div class="page-container">
+        <div class="title-wrap">
+            <div class="letter">C</div>
+            <div class="letter">A</div>
+            <div class="letter">R</div>
+            <div class="letter">T</div>
+            <div class="letter">O</div>
+            <div class="letter">G</div>
+            <div class="letter">R</div>
+            <div class="letter">A</div>
+            <div class="letter">P</div>
+            <div class="letter">H</div>
+            <div class="letter">E</div>
+            <div class="letter">R</div>
+            <div class="letter">S</div>
+            <div class="link"><a href="https://www.thunderworksgames.com/cartographers.html">get it!</a></div>
+        </div>
+        
+        
+        <div class="terrain-wrap">
+            <div class="a-b-selector-wrap">
+                <div class="a-b-selector">
+                    <div class="a-b-choice choice-a" id="selector-choice-a">A</div>
+                    <div class="a-b-choice choice-b" id="selector-choice-b">B</div>
+                </div>
+            </div>
+            
+            
+            <div class="terrain-type terrain-forest active" data-terrain="forest"><div class="terrain-inner"></div></div>
+            <div class="terrain-type terrain-field" data-terrain="field"><div class="terrain-inner"></div></div>
+            <div class="terrain-type terrain-river" data-terrain="river"><div class="terrain-inner"></div></div>
+            <div class="terrain-type terrain-town" data-terrain="town"><div class="terrain-inner"></div></div>
+            <div class="terrain-type terrain-monster" data-terrain="monster"><div class="terrain-inner"></div></div>
+
+            <div class="terrain-spacer"><div class="terrain-inner"></div></div>
+
+            <div class="terrain-type terrain-crevasse" data-terrain="crevasse"><div class="terrain-inner"></div></div>
+            <div class="terrain-type terrain-mountain" data-terrain="mountain"><div class="terrain-inner"></div></div>
+            <div class="terrain-type terrain-ruins" data-terrain="ruins"><div class="terrain-inner"></div></div>
+        </div>
+        
+        <div class="board-wrap">
+            
+                <div class="row" id="row_a">
+                    <div class="cell label">A</div>
+                    <div class="cell game-square" id="row_a_cell_1"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_a_cell_2"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_a_cell_3"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_a_cell_4"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_a_cell_5"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_a_cell_6"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_a_cell_7"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_a_cell_8"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_a_cell_9"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_a_cell_10"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_a_cell_11"><div class="inner"></div></div>
+                </div>
+                <div class="row" id="row_b">
+                    <div class="cell label">B</div>
+                    <div class="cell game-square" id="row_b_cell_1"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_b_cell_2"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_b_cell_3"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_b_cell_4"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_b_cell_5"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_b_cell_6"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_b_cell_7"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_b_cell_8"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_b_cell_9"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_b_cell_10"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_b_cell_11"><div class="inner"></div></div>
+                </div>
+                <div class="row" id="row_c">
+                    <div class="cell label">C</div>
+                    <div class="cell game-square" id="row_c_cell_1"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_c_cell_2"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_c_cell_3"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_c_cell_4"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_c_cell_5"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_c_cell_6"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_c_cell_7"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_c_cell_8"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_c_cell_9"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_c_cell_10"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_c_cell_11"><div class="inner"></div></div>
+                </div>
+                <div class="row" id="row_d">
+                    <div class="cell label">D</div>
+                    <div class="cell game-square" id="row_d_cell_1"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_d_cell_2"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_d_cell_3"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_d_cell_4"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_d_cell_5"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_d_cell_6"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_d_cell_7"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_d_cell_8"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_d_cell_9"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_d_cell_10"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_d_cell_11"><div class="inner"></div></div>
+                </div>
+                <div class="row" id="row_e">
+                    <div class="cell label">E</div>
+                    <div class="cell game-square" id="row_e_cell_1"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_e_cell_2"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_e_cell_3"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_e_cell_4"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_e_cell_5"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_e_cell_6"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_e_cell_7"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_e_cell_8"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_e_cell_9"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_e_cell_10"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_e_cell_11"><div class="inner"></div></div>
+                </div>
+                <div class="row" id="row_f">
+                    <div class="cell label">F</div>
+                    <div class="cell game-square" id="row_f_cell_1"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_f_cell_2"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_f_cell_3"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_f_cell_4"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_f_cell_5"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_f_cell_6"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_f_cell_7"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_f_cell_8"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_f_cell_9"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_f_cell_10"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_f_cell_11"><div class="inner"></div></div>
+                </div>
+                <div class="row" id="row_g">
+                    <div class="cell label">G</div>
+                    <div class="cell game-square" id="row_g_cell_1"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_g_cell_2"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_g_cell_3"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_g_cell_4"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_g_cell_5"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_g_cell_6"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_g_cell_7"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_g_cell_8"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_g_cell_9"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_g_cell_10"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_g_cell_11"><div class="inner"></div></div>
+                </div>
+                <div class="row" id="row_h">
+                    <div class="cell label">H</div>
+                    <div class="cell game-square" id="row_h_cell_1"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_h_cell_2"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_h_cell_3"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_h_cell_4"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_h_cell_5"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_h_cell_6"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_h_cell_7"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_h_cell_8"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_h_cell_9"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_h_cell_10"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_h_cell_11"><div class="inner"></div></div>
+                </div>
+                <div class="row" id="row_i">
+                    <div class="cell label">I</div>
+                    <div class="cell game-square" id="row_i_cell_1"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_i_cell_2"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_i_cell_3"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_i_cell_4"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_i_cell_5"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_i_cell_6"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_i_cell_7"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_i_cell_8"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_i_cell_9"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_i_cell_10"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_i_cell_11"><div class="inner"></div></div>
+                </div>
+                <div class="row" id="row_j">
+                    <div class="cell label">J</div>
+                    <div class="cell game-square" id="row_j_cell_1"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_j_cell_2"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_j_cell_3"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_j_cell_4"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_j_cell_5"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_j_cell_6"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_j_cell_7"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_j_cell_8"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_j_cell_9"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_j_cell_10"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_j_cell_11"><div class="inner"></div></div>
+                </div>
+                <div class="row" id="row_k">
+                    <div class="cell label">K</div>
+                    <div class="cell game-square" id="row_k_cell_1"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_k_cell_2"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_k_cell_3"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_k_cell_4"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_k_cell_5"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_k_cell_6"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_k_cell_7"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_k_cell_8"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_k_cell_9"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_k_cell_10"><div class="inner"></div></div>
+                    <div class="cell game-square" id="row_k_cell_11"><div class="inner"></div></div>
+                </div>
+                <div class="row" id="row_labels">
+                    <div class="cell label no-corner"> </div>
+                    <div class="cell number-label" id="row_labels_cell_1">1</div>
+                    <div class="cell number-label" id="row_labels_cell_2">2</div>
+                    <div class="cell number-label" id="row_labels_cell_3">3</div>
+                    <div class="cell number-label" id="row_labels_cell_4">4</div>
+                    <div class="cell number-label" id="row_labels_cell_5">5</div>
+                    <div class="cell number-label" id="row_labels_cell_6">6</div>
+                    <div class="cell number-label" id="row_labels_cell_7">7</div>
+                    <div class="cell number-label" id="row_labels_cell_8">8</div>
+                    <div class="cell number-label" id="row_labels_cell_9">9</div>
+                    <div class="cell number-label" id="row_labels_cell_10">10</div>
+                    <div class="cell number-label" id="row_labels_cell_11">11</div>
+                </div>
+            
+            </div>
+        
+            <div class="gold-coins-wrap" id="gold-coins-wrapper">
+                <div class="gold-coin"><div class="inner"></div></div>
+                <div class="gold-coin"><div class="inner"></div></div>
+                <div class="gold-coin"><div class="inner"></div></div>
+                <div class="gold-coin"><div class="inner"></div></div>
+                <div class="gold-coin"><div class="inner"></div></div>
+                <div class="gold-coin"><div class="inner"></div></div>
+                <div class="gold-coin"><div class="inner"></div></div>
+                <div class="gold-coin"><div class="inner"></div></div>
+                <div class="gold-coin"><div class="inner"></div></div>
+                <div class="gold-coin"><div class="inner"></div></div>
+                <div class="gold-coin"><div class="inner"></div></div>
+                <div class="gold-coin"><div class="inner"></div></div>
+                <div class="gold-coin"><div class="inner"></div></div>
+                <div class="gold-coin"><div class="inner"></div></div>
+            </div>
+        
+            <div class="score-cards-wrap">
+
+                <div class="score-card" id="score-card-spring" data-season="spring">
+                    <div class="score-card-title">Spring</div>
+                    <div class="score-card-left">
+                        <div class="score-row  row-1">
+                            <div class="score-field score-field-a">
+                                <input class="score-input score-field-a-input" min="0" type="number" />
+                            </div>
+                            <div class="score-field score-field-b">
+                                <input class="score-input score-field-b-input" min="0" type="number" />
+                            </div>
+                        </div>
+                        <div class="score-row row-2">
+                            <div class="score-field score-field-gold">
+                                <input class="score-input score-gold-input" min="0" type="number" />
+                            </div>
+                            <div class="score-field score-field-monsters">
+                                <input class="score-input score-monsters-b-input" max="0" type="number" />                                
+                            </div>
+                        </div>
+                    </div>
+                    <div class="score-card-right">
+                        <div class="score-result"></div>
+                    </div>
+                </div>
+
+
+                <div class="score-card" id="score-card-summer" data-season="summer">
+                    <div class="score-card-title">Summer</div>
+                    <div class="score-card-left">
+                        <div class="score-row  row-1">
+                            <div class="score-field score-field-a">
+                                <input class="score-input score-field-a-input" min="0" type="number" />
+                            </div>
+                            <div class="score-field score-field-b">
+                                <input class="score-input score-field-b-input" min="0" type="number" />
+                            </div>
+                        </div>
+                        <div class="score-row row-2">
+                            <div class="score-field score-field-gold">
+                                <input class="score-input score-gold-input" min="0" type="number" />
+                            </div>
+                            <div class="score-field score-field-monsters">
+                                <input class="score-input score-monsters-b-input" max="0" type="number" />                                
+                            </div>
+                        </div>
+                    </div>
+                    <div class="score-card-right">
+                        <div class="score-result"></div>
+                    </div>
+                </div>
+
+
+                
+                <div class="score-card" id="score-card-fall" data-season="fall">
+                    <div class="score-card-title">Fall</div>
+                    <div class="score-card-left">
+                        <div class="score-row  row-1">
+                            <div class="score-field score-field-a">
+                                <input class="score-input score-field-a-input" min="0" type="number" />
+                            </div>
+                            <div class="score-field score-field-b">
+                                <input class="score-input score-field-b-input" min="0" type="number" />
+                            </div>
+                        </div>
+                        <div class="score-row row-2">
+                            <div class="score-field score-field-gold">
+                                <input class="score-input score-gold-input" min="0" type="number" />
+                            </div>
+                            <div class="score-field score-field-monsters">
+                                <input class="score-input score-monsters-b-input" max="0" type="number" />                                
+                            </div>
+                        </div>
+                    </div>
+                    <div class="score-card-right">
+                        <div class="score-result"></div>
+                    </div>
+                </div>
+
+
+                <div class="score-card" id="score-card-winter" data-season="winter">
+                    <div class="score-card-title">Winter</div>
+                    <div class="score-card-left">
+                        <div class="score-row  row-1">
+                            <div class="score-field score-field-a">
+                                <input class="score-input score-field-a-input" min="0" type="number" />
+                            </div>
+                            <div class="score-field score-field-b">
+                                <input class="score-input score-field-b-input" min="0" type="number" />
+                            </div>
+                        </div>
+                        <div class="score-row row-2">
+                            <div class="score-field score-field-gold">
+                                <input class="score-input score-gold-input" min="0" type="number" />
+                            </div>
+                            <div class="score-field score-field-monsters">
+                                <input class="score-input score-monsters-b-input" max="0" type="number" />                                
+                            </div>
+                        </div>
+                    </div>
+                    <div class="score-card-right">
+                        <div class="score-result"></div>
+                    </div>
+                </div>
+                
+                <div class="final-score-card">
+                    <div class="score-card-title">Final</div>
+                    <div class="final-score-result" id="final-score"></div>
+                </div>
+
+                
+            </div>
+	    </div>
+
+</body>
+</html>
