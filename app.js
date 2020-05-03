@@ -4,6 +4,7 @@
 var currentTerrain = 'forest';
 var currentPlayBoard = 'A';
 var gameBoardStarted = false;
+var showAboutPanel = false;
 
 var playTerrains = [ 'forest', 'town', 'river', 'field', 'monster' ];
 
@@ -91,13 +92,37 @@ var initScoreCards = function() {
     };
 
     document.querySelectorAll('.score-card').forEach(function(card) {
+
         var season = card.getAttribute('data-season');
-        card.querySelectorAll('.score-input').forEach(function(input){
-            input.addEventListener('change', function() {
-                scoreKeeper.calc(season);
-            });
+        card.querySelectorAll('.score-input').forEach(function(input) {
+            
+            var options = {
+              wrapperClass: 'ispin-wrapper',
+              buttonsClass: 'ispin-button',
+              step: 1,
+              pageStep: 10,
+              disabled: false,
+              repeatInterval: 200,
+              wrapOverflow: false,
+              parse: Number,
+              format: String
+            };
+            
+            if (input.classList.contains('score-monsters-input')) {
+                options.max = 0;
+            } else {
+                options.min = 0;
+            }
+            
+            
+            options.onChange = function() {
+                setTimeout(function() {
+                    scoreKeeper.calc(season);
+                }, 10);
+            };
+            
+            var spinner = new ISpin(input, options);
         });
-        
     });
 };
 
@@ -109,6 +134,25 @@ var initTerrainSwitcher = function () {
             currentTerrain = this.getAttribute('data-terrain');
         });
     });
+};
+
+var initAboutButton = function () {
+    document.querySelectorAll('.about-link').forEach(function(el){
+        el.addEventListener('click', function() {
+            var aboutPanel = document.getElementById('about-panel');
+
+            if (showAboutPanel) {
+                showAboutPanel = false;
+                this.classList.remove('active');
+                aboutPanel.classList.remove('active');
+            } else {
+                showAboutPanel = true;
+                this.classList.add('active');
+                aboutPanel.classList.add('active');
+            }
+        });
+    });
+    
 };
 
 var initGameBoard = function () {
@@ -296,6 +340,7 @@ var setupB = function() {
 
 
 window.addEventListener('DOMContentLoaded', function (event) {
+    initAboutButton();
     gameInit();
     setupA();
 });

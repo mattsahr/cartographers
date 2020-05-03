@@ -8,34 +8,6 @@
     <script type="text/javascript" src="app.js"></script>
     <script type="text/javascript">
 
-        /*
-        var addSpinner = function () {
-            document.querySelectorAll('#score-card-spring .score-field-a').forEach(function (inputBox) {
-                
-                var spinner = new ISpin(inputBox, {
-                  // options with defaults
-                  wrapperClass: 'ispin-wrapper',
-                  buttonsClass: 'ispin-button',
-                  step: 1,
-                  pageStep: 10,
-                  disabled: false,
-                  repeatInterval: 200,
-                  wrapOverflow: false,
-                  parse: Number,
-                  format: String
-                });
-                
-                
-                console.log('spinner 2!', spinner);
-            });
-            
-        };
-
-        window.addEventListener('DOMContentLoaded', function (event) {
-            addSpinner();
-        });
-
-        */
     </script>
 </head>
 
@@ -59,6 +31,19 @@
     </div>
 
 	<div class="page-container">
+
+        <div class="modal-panel-about" id="about-panel">
+            <div class="modal-about-info">
+                <p>This is a score card for the board game <em>Cartographers</em> by Thunderworks Games.</p>
+
+                <p><a href="https://www.thunderworksgames.com/cartographers.html">Get the board game</a>.</p>
+
+                <p>Copy or modify this score card on <a href="https://github.com/mattsahr/cartographers">Github</a>.</p>
+                </p>
+            </div>
+        </div>
+    
+
         <div class="title-wrap">
             <div class="letter">C</div>
             <div class="letter">A</div>
@@ -72,8 +57,8 @@
             <div class="letter">H</div>
             <div class="letter">E</div>
             <div class="letter">R</div>
-            <div class="letter">S</div>
-            <div class="link"><a href="https://www.thunderworksgames.com/cartographers.html">get it!</a></div>
+            <div class="letter" style="margin-right: -2vw;">S</div>
+            <div class="about-link"><span class="question">?</span><span class="x-close">X</span></div>
         </div>
         
         
@@ -255,7 +240,7 @@
                     <div class="cell game-square" id="row_k_cell_10"><div class="inner"></div></div>
                     <div class="cell game-square" id="row_k_cell_11"><div class="inner"></div></div>
                 </div>
-                <div class="row" id="row_labels">
+                <div class="row numbers-row" id="row_labels">
                     <div class="cell label no-corner"> </div>
                     <div class="cell number-label" id="row_labels_cell_1">1</div>
                     <div class="cell number-label" id="row_labels_cell_2">2</div>
@@ -296,17 +281,22 @@
                     <div class="score-card-left">
                         <div class="score-row  row-1">
                             <div class="score-field score-field-a">
-                                <input class="score-input score-field-a-input" type="number" pattern="[0-9]*" inputmode="numeric" min="0" />                            </div>
+                                <input class="score-input score-field-a-input" 
+                                       type="number" min="0" pattern="[0-9]*" inputmode="numeric" />
+                            </div>
                             <div class="score-field score-field-b">
-                                <input class="score-input score-field-b-input" min="0" type="number" pattern="[0-9]*" inputmode="numeric" />
+                                <input class="score-input score-field-b-input" 
+                                       type="number" min="0" pattern="[0-9]*" inputmode="numeric" />
                             </div>
                         </div>
                         <div class="score-row row-2">
                             <div class="score-field score-field-gold">
-                                <input class="score-input score-gold-input" min="0" type="number" pattern="[0-9]*" inputmode="numeric" />
+                                <input class="score-input score-gold-input" 
+                                       type="number" min="0" pattern="[0-9]*" inputmode="numeric" />
                             </div>
                             <div class="score-field score-field-monsters">
-                                <input class="score-input score-monsters-b-input" max="0" type="number" pattern="[0-9]*" inputmode="numeric" />                                
+                                <input class="score-input score-monsters-input" 
+                                       type="number" max="0" pattern="[0-9]*" inputmode="numeric" />                                
                             </div>
                         </div>
                     </div>
@@ -320,18 +310,22 @@
                     <div class="score-card-left">
                         <div class="score-row  row-1">
                             <div class="score-field score-field-a">
-                                <input class="score-input score-field-a-input" min="0" type="number" pattern="[0-9]*" inputmode="numeric" />
+                                <input class="score-input score-field-a-input" 
+                                       type="number" min="0" pattern="[0-9]*" inputmode="numeric" />
                             </div>
                             <div class="score-field score-field-b">
-                                <input class="score-input score-field-b-input" min="0" type="number" pattern="[0-9]*" inputmode="numeric" />
+                                <input class="score-input score-field-b-input" 
+                                       type="number" min="0" pattern="[0-9]*" inputmode="numeric" />
                             </div>
                         </div>
                         <div class="score-row row-2">
                             <div class="score-field score-field-gold">
-                                <input class="score-input score-gold-input" min="0" type="number" pattern="[0-9]*" inputmode="numeric" />
+                                <input class="score-input score-gold-input" 
+                                       type="number" min="0" pattern="[0-9]*" inputmode="numeric" />
                             </div>
                             <div class="score-field score-field-monsters">
-                                <input class="score-input score-monsters-b-input" max="0" type="number" pattern="[0-9]*" inputmode="numeric" />                                
+                                <input class="score-input score-monsters-input" 
+                                       type="number" max="0" pattern="[0-9]*" inputmode="numeric" />                                
                             </div>
                         </div>
                     </div>
@@ -347,18 +341,22 @@
                     <div class="score-card-left">
                         <div class="score-row  row-1">
                             <div class="score-field score-field-a">
-                                <input class="score-input score-field-a-input" min="0" type="number" pattern="[0-9]*" inputmode="numeric" />
+                                <input class="score-input score-field-a-input" 
+                                       type="number" min="0" pattern="[0-9]*" inputmode="numeric" />
                             </div>
                             <div class="score-field score-field-b">
-                                <input class="score-input score-field-b-input" min="0" type="number" pattern="[0-9]*" inputmode="numeric" />
+                                <input class="score-input score-field-b-input" 
+                                       type="number" min="0" pattern="[0-9]*" inputmode="numeric" />
                             </div>
                         </div>
                         <div class="score-row row-2">
                             <div class="score-field score-field-gold">
-                                <input class="score-input score-gold-input" min="0" type="number" pattern="[0-9]*" inputmode="numeric" />
+                                <input class="score-input score-gold-input" 
+                                       type="number" min="0" pattern="[0-9]*" inputmode="numeric" />
                             </div>
                             <div class="score-field score-field-monsters">
-                                <input class="score-input score-monsters-b-input" max="0" type="number"pattern="[0-9]*" inputmode="numeric"  />                                
+                                <input class="score-input score-monsters-input" 
+                                       type="number"max="0" pattern="[0-9]*" inputmode="numeric"  />                                
                             </div>
                         </div>
                     </div>
@@ -373,18 +371,22 @@
                     <div class="score-card-left">
                         <div class="score-row  row-1">
                             <div class="score-field score-field-a">
-                                <input class="score-input score-field-a-input" min="0" type="number" pattern="[0-9]*" inputmode="numeric" />
+                                <input class="score-input score-field-a-input" 
+                                       type="number" min="0" pattern="[0-9]*" inputmode="numeric" />
                             </div>
                             <div class="score-field score-field-b">
-                                <input class="score-input score-field-b-input" min="0" type="number" pattern="[0-9]*" inputmode="numeric" />
+                                <input class="score-input score-field-b-input" 
+                                       type="number" min="0" pattern="[0-9]*" inputmode="numeric" />
                             </div>
                         </div>
                         <div class="score-row row-2">
                             <div class="score-field score-field-gold">
-                                <input class="score-input score-gold-input" min="0" type="number" pattern="[0-9]*" inputmode="numeric" />
+                                <input class="score-input score-gold-input" 
+                                       type="number" min="0" pattern="[0-9]*" inputmode="numeric" />
                             </div>
                             <div class="score-field score-field-monsters">
-                                <input class="score-input score-monsters-b-input" max="0" type="number" pattern="[0-9]*" inputmode="numeric" />                                
+                                <input class="score-input score-monsters-input" 
+                                       type="number" max="0" pattern="[0-9]*" inputmode="numeric" />                                
                             </div>
                         </div>
                     </div>

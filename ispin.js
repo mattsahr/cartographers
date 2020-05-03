@@ -98,7 +98,7 @@
     throw new TypeError("Invalid attempt to spread non-iterable instance");
   }
 
-  var ISpin =
+var ISpin =
   /*#__PURE__*/
   function () {
     function ISpin(el, opts) {
@@ -112,6 +112,7 @@
       this._onMouseUp = this._onMouseUp.bind(this);
       this._onMouseLeave = this._onMouseLeave.bind(this);
       this._onWheel = this._onWheel.bind(this);
+      this._onBlur = this._onBlur.bind(this);
       this.build();
       this.update(opts);
     }
@@ -135,6 +136,7 @@
 
         Object.keys(this._buttons).forEach(function (k) {
           var b = _this._buttons[k];
+          b.setAttribute('tabindex', '-1');
 
           _this._wrapper.appendChild(b);
 
@@ -145,6 +147,7 @@
         });
         this.el.addEventListener('keydown', this._onKeyDown);
         this.el.addEventListener('wheel', this._onWheel);
+        this.el.addEventListener('blur', this._onBlur);
       }
     }, {
       key: "update",
@@ -180,6 +183,13 @@
 
         _extends(this.options, opts);
       }
+    }, {
+        key: '_onBlur',
+        value: function _onBlur(e) {
+            if (this.options.onChange) {
+                this.options.onChange();
+            }
+        }
     }, {
       key: "destroy",
       value: function destroy() {
@@ -263,6 +273,9 @@
         value = Number(value.toFixed(this.precision));
         if (this.options.max != null && value > this.options.max) value = this.options.max;
         if (this.options.min != null && value < this.options.min) value = this.options.min;
+        if (this.options.onChange) {
+            this.options.onChange(value);
+        }
         return value;
       }
     }, {
@@ -319,7 +332,8 @@
     repeatInterval: 200,
     wrapOverflow: false,
     parse: Number,
-    format: String
+    format: String,
+    onChange: null 
   };
 
   function precision(num) {
