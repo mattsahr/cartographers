@@ -121,6 +121,7 @@ body {
     height: 7vw;
     display: flex;
     justify-content: space-between;
+    touch-action: manipulation;
 }
 
 .terrain-wrap .terrain-type {
@@ -162,6 +163,7 @@ body {
     width: 90vw;
     display: flex;
     flex-direction: row;
+    touch-action: manipulation;
 }
 
 .gold-coin {
@@ -203,7 +205,7 @@ body {
 
 .modal-about-info {
     margin: 14vw 16vw 0 16vw;
-    font-size: 20px;
+    font-size: 28px;
 }
 
 .modal-about-info a {
@@ -324,6 +326,7 @@ body {
 .score-card-left {
     width: 70%;
     height: 100%;
+    touch-action: manipulation;
 }
 
 .score-card-right {
@@ -402,6 +405,7 @@ input.score-input:focus {
     display: flex;
     flex-direction: row;            
     height: 8.6%;
+    touch-action: manipulation;
 }
 
 .row.numbers-row {
@@ -481,15 +485,11 @@ input.score-input:focus {
 .game-square.town, 
 .terrain-wrap .terrain-town .terrain-inner {
     background:
-    linear-gradient(45deg, rgb(220, 100, 80) 45px, transparent 45px)64px 64px,
-    linear-gradient(45deg, rgb(220, 100, 80) 45px, transparent 45px,transparent 91px, rgb(200, 80, 60) 91px, rgb(200, 80, 60) 135px, transparent 135px),
-    linear-gradient(-45deg, rgb(220, 100, 80) 23px, transparent 23px, transparent 68px, rgb(220, 100, 80) 68px, rgb(220, 100, 80) 113px,transparent 113px,transparent 158px, rgb(220, 100, 80) 158px);
+    linear-gradient(45deg, rgb(220, 100, 80) 22.5px, transparent 22.5px)32px 32px,
+    linear-gradient(45deg, rgb(220, 100, 80) 22.5px, transparent 22.5px,transparent 45.5px, rgb(200, 80, 60) 45.5px, rgb(200, 80, 60) 67.5px, transparent 67.5px),
+    linear-gradient(-45deg, rgb(220, 100, 80) 11.5px, transparent 11.5px, transparent 34px, rgb(220, 100, 80) 34px, rgb(220, 100, 80) 56.5px,transparent 56.5px,transparent 79px, rgb(220, 100, 80) 79px);
     background-color:rgb(200, 80, 60);
-    background-size: 128px 128px;
-    
-    /*
-    background-color: rgb(220, 100, 80);
-*/
+    background-size: 64px 64px;
 }
 
 
@@ -592,6 +592,28 @@ input.score-input:focus {
     opacity: 0.3;    
 }
 
+.score-field-monsters {
+    position: relative;
+    overflow: hidden;
+}
+
+.score-field-monsters::after {
+    background-image: url(monster.svg);
+    background-size: 5.5vw 5.4vw;
+    display: inline-block;
+    width: 5.6vw;
+    height: 5.4vw;
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0.6vw;
+    opacity: 0.05;
+    pointer-events: none;
+}
+
+.score-input.score-monsters-input {
+    letter-spacing: 0.15em;
+}
 
 .terrain-mountain, .terrain-crevasse, .terrain-ruins {
     display: none;
@@ -755,6 +777,12 @@ input.score-input {
         margin: 0 0 8vw 0;
         height: 18vw;
         border-width: 1px;
+    }
+    
+    .score-field-monsters::after {
+        background-size: 10vw 10vw;
+        width: 10vw;
+        height: 9.8vw;
     }
     
     input.score-input {
