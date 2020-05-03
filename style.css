@@ -605,7 +605,7 @@ input.score-input:focus {
 /* =============== RESPONSIVE ======================= */
 
 
-@media only screen and (max-width: 767px) or (pointer: coarse) {
+@media /*only screen and (max-width: 767px) or */ (pointer: coarse) {
 
     .title-wrap {
         padding: 1vw 0vw 2vw 3vw;
