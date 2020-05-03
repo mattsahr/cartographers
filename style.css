@@ -562,8 +562,8 @@ input.score-input:focus {
     height: 5.2vw;
     content: "";
     position: absolute;
-    top: 0.6vw;
-    left: 0.7vw;
+    top: 1vw;
+    left: 0.9vw;
     opacity: 0.4;      
 }
 
@@ -572,10 +572,10 @@ input.score-input:focus {
     background-size: 3.5vw 3.4vw;
     display: inline-block;
     width: 3.6vw;
-    height: 3.2vw;
+    height: 3.4vw;
     content: "";
     position: absolute;
-    top: 0.7vw;
+    top: 0.5vw;
     left: 0.65vw;
     opacity: 0.6;       
 }
@@ -584,11 +584,11 @@ input.score-input:focus {
     background-size: 5.5vw 5.4vw;
     display: inline-block;
     width: 5.6vw;
-    height: 5.2vw;
+    height: 5.4vw;
     content: "";
     position: absolute;
     top: 0.6vw;
-    left: 0.7vw;
+    left: 0.8vw;
     opacity: 0.3;    
 }
 
@@ -680,7 +680,7 @@ input.score-input {
     }
 
     .title-wrap .about-link {
-        margin: -10px -20px 0 0;
+        margin: -4px -20px 0 0;
         cursor: pointer;
     }
     
