@@ -107,7 +107,7 @@ body {
 
 
 .pending-icon {
-    background-image: url(/images/git-commit.svg);
+    background-image: url(../images/git-commit.svg);
     background-size: 2.4vw 2.4vw;
     position: absolute;
     display: block;
@@ -133,7 +133,7 @@ body {
 @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
 
 .change-settings-button {
-    background-image: url(/images/ionicons-git-compare.svg);
+    background-image: url(../images/ionicons-git-compare.svg);
     background-size: 2.4vw 2.4vw;
     position: absolute;
     display: block;
@@ -769,7 +769,7 @@ input.score-input:focus {
 }
 
 .terrain-ruins .terrain-inner::after {
-    background-image: url(/images/ruins.svg);
+    background-image: url(../images/ruins.svg);
     background-size: 2.6vw 2.8vw;
     display: inline-block;
     width: 2.6vw;
@@ -781,7 +781,7 @@ input.score-input:focus {
 }
 
 .game-square.ruins::after {
-    background-image: url(/images/ruins.svg);
+    background-image: url(../images/ruins.svg);
     background-size: 4.8vw 5vw;
     display: inline-block;
     width: 4.8vw;
@@ -799,7 +799,7 @@ input.score-input:focus {
 }
 
 .terrain-mountain .terrain-inner::after {
-    background-image: url(/images/mountain.svg);
+    background-image: url(../images/mountain.svg);
     background-size: 3.5vw 3.4vw;
     display: inline-block;
     width: 3.6vw;
@@ -812,7 +812,7 @@ input.score-input:focus {
 }
 
 .game-square.mountain::after {
-    background-image: url(/images/mountain.svg);
+    background-image: url(../images/mountain.svg);
     background-size: 5.3vw 5vw;
     display: inline-block;
     width: 5.3vw;
@@ -825,7 +825,7 @@ input.score-input:focus {
 }
 
 .terrain-wrap .terrain-monster .terrain-inner::before {
-    background-image: url(/images/monster.svg);
+    background-image: url(../images/monster.svg);
     background-size: 3.5vw 3.4vw;
     display: inline-block;
     width: 3.6vw;
@@ -838,7 +838,7 @@ input.score-input:focus {
 }
 
 .game-square.monster::before {
-    background-image: url(/images/monster.svg);
+    background-image: url(../images/monster.svg);
     background-size: 5.5vw 5.4vw;
     display: inline-block;
     width: 5.6vw;
@@ -856,7 +856,7 @@ input.score-input:focus {
 }
 
 .score-field-monsters::after {
-    background-image: url(/images/monster.svg);
+    background-image: url(../images/monster.svg);
     background-size: 5.5vw 5.4vw;
     display: inline-block;
     width: 5.6vw;

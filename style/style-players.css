@@ -99,7 +99,7 @@
 
 .game-container-controls .expand-button,
 .game-container-controls .collapse-button {
-    background-image: url(/images/chevrons-down.svg);
+    background-image: url(../images/chevrons-down.svg);
     background-size: 2.4vw 2.4vw;
     background-repeat: no-repeat;
     background-position: calc(100% - 0.4vw) 0.6vw;
@@ -115,7 +115,7 @@
 }
 
 .game-container-controls .collapse-button {
-    background-image: url(/images/chevrons-up.svg);
+    background-image: url(../images/chevrons-up.svg);
     display: none;
 }
 
