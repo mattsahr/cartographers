@@ -1,0 +1,453 @@
+
+/* ============== NETWORK GAME MODE =========================== */
+.game-container {
+    display: block;
+    margin: 0;
+    position: absolute;
+    z-index: 50;
+    width: 100%;
+    overflow: hidden;
+    padding: 0;
+    height: 24vw;
+    transition: transform 700ms cubic-bezier(0.5, 1, 0.89, 1);
+    transform: translate(0, -21vw);
+}
+
+.game-inner-wrap {
+    background: rgb(40, 42, 70);
+    height: 20.4vw;
+    margin: 0 0 0.6vw 0;
+    width: 100%;
+    color: white;
+    scrollbar-width: thin;
+    scrollbar-color: #90A4AE /* thumbBG */ #CFD8DC  /* scrollbarBG */ ;
+    overflow-x: scroll;
+    overflow-y: hidden;
+}
+
+.game-inner-wrap::-webkit-scrollbar {
+    width: 14px;
+    height: 14px;
+}
+.game-inner-wrap::-webkit-scrollbar-track {
+  background: #CFD8DC  /* scrollbarBG */;
+}
+.game-inner-wrap::-webkit-scrollbar-thumb {
+  background-color: #90A4AE /* thumbBG */;
+  border-radius: 3px;
+  border: 0 solid #CFD8DC  /* scrollbarBG */;
+}
+
+.game-frame {
+    height:  calc(20.4vw - 15px);
+    padding: 0 2vw;
+    display: flex;
+}
+
+.game-container-controls {
+    width: 100%;
+    height: 3vw;
+    border: solid rgb(180, 180, 180);
+    border-width: 0 0 1px 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 300ms;
+}
+
+.game-container-controls-inner {
+    width: 93vw;
+    display: flex;
+    height: 3vw;
+    padding: 0 3vw 0 4vw;
+    justify-content: space-between;
+}
+
+.game-container-controls .info,
+.game-container-controls .buttons {
+    color: rgb(70, 70, 70);
+    font-size: 1.7vw;
+    display: flex;
+    font-family: sans-serif;
+}
+
+.game-container-controls .info {
+    padding: 0.2vw 2vw 0 3.4vw;
+}
+
+.game-container-controls .buttons {
+    padding: 0 0 0 2vw;
+}
+
+.game-container-controls .info > div {
+    padding: 0.4vw 2vw 0 2vw;
+}
+
+.game-container-controls .info .label {
+    font-size: 0.7em;
+    padding: 0 1vw 0 0;
+    text-transform: uppercase;
+    opacity: 0.4;
+}
+
+.game-container-controls .info .data {
+    padding: 0 1vw 0 0;
+}
+
+.game-container-controls .buttons {
+    justify-content: right;
+}
+
+.game-container-controls .expand-button,
+.game-container-controls .collapse-button {
+    background-image: url(/images/chevrons-down.svg);
+    background-size: 2.4vw 2.4vw;
+    background-repeat: no-repeat;
+    background-position: calc(100% - 0.4vw) 0.6vw;
+    height: 3vw;
+    position: relative;
+    border-radius: 2px;
+    opacity: 0.7;
+    cursor: pointer;
+    padding: 0.8vw 3.6vw 0 1vw;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin: -0.3vw 0 0 0;
+}
+
+.game-container-controls .collapse-button {
+    background-image: url(/images/chevrons-up.svg);
+    display: none;
+}
+
+.game-container-controls .expand-button:hover {
+    background-color: rgb(255, 246, 160);
+    opacity: 1;
+    color: rgb(0, 0, 0);
+}
+
+.game-container-controls .collapse-button:hover {
+    background-color: rgb(255, 246, 160);
+    opacity: 1;
+    color: rgb(0, 0, 0);
+}
+
+
+.network-game-active .game-container-controls {
+    pointer-events: all;
+    opacity: 1;
+}
+
+.network-game-active.network-game-open .game-container {
+    transform: translate(0, 0);
+} 
+
+.network-game-active.network-game-open .game-container .collapse-button {
+    display: block;
+}
+.network-game-active.network-game-open .game-container .expand-button {
+    display: none;
+}
+
+/* ============= OPPONENT BOARDS ============================ */
+
+
+.opponent-board-wrapper   {
+    margin: 0 1vw 0 0;
+    opacity: 0.4;
+}
+
+.opponent-board-wrapper:hover {
+    opacity: 1;
+}
+
+.opponent-title {
+    font-family: sans-serif;
+    font-size: 1.8vw;
+    color: rgb(230, 240, 255);
+    overflow: hidden;
+    height: 2.8vw;
+    padding: 0.5vw 0 0 0.7vw; 
+}
+
+.opponent-board-wrapper .board-wrap {
+    width: 16.6vw;
+    height: 15.4vw;
+    padding: 0;
+    margin: 0;
+}
+ 
+
+.opponent-board-wrapper .board-wrap:hover {
+    opacity: 1;
+}
+
+.opponent-board-wrapper .row {
+    height: 9%;
+} 
+.opponent-board-wrapper .row .cell {
+    border-width: 0;
+    line-height: 1;
+    width: 9%;
+}
+
+.opponent-board-wrapper  .row .cell.label {
+    width: 0;
+    display: none;
+}
+
+.opponent-board-wrapper .row.numbers-row {
+    height: 0;
+    display: none;
+}
+.opponent-board-wrapper .game-square {
+    background-color: rgb(50, 64, 96);
+}
+
+.opponent-board-wrapper .game-square.forest {
+    font-size: 20px;
+    background-color: rgb(50, 145, 70);
+    background-image: repeating-radial-gradient( circle at 0.5em 0.5em, rgb(30, 135, 50), rgb(30, 135, 50) 0.1em, transparent 0.11em, transparent 0.45em, rgb(30, 135, 150) 0.46em);
+    background-size: 1em 1em;
+    background-position: 0.5em 0.5em;
+}
+
+.opponent-board-wrapper .game-square.river {
+    background: radial-gradient(circle at 100% 50%, rgb(0 0 0 / 0%) 20%, rgba(255,255,255,.3) 21%, rgba(255,255,255,.3) 34%, rgb(0 0 0 / 0%) 35%, rgb(0 0 0 / 0%)), radial-gradient(circle at 0% 50%, rgb(0 0 0 / 0%) 20%, rgba(255,255,255,.3) 21%, rgba(255,255,255,.3) 34%, rgb(0 0 0 / 0%) 35%, rgb(0 0 0 / 0%)) 0 -6vw;
+    background-color: rgb(20 70 120);
+    background-size: 1vw 1.33vw;
+}
+
+.opponent-board-wrapper .game-square.field {
+    background-color: rgb(100, 90, 70);
+    background-image: repeating-linear-gradient(45deg, rgb(0 0 0 / 0%), rgb(0 0 0 / 0%) 7.5px, rgba(255,255,255,0.2) 7.5px, rgba(255,255,255,0.2) 13px);
+}
+
+.opponent-board-wrapper .game-square.town {
+    background:
+    linear-gradient(45deg, rgb(160, 40, 20) 11.25px, transparent 11.25px) 16px 16px,
+    linear-gradient(45deg, rgb(160, 40, 20) 11.25px, transparent 11.25px,transparent 22.75px, rgb(160, 40, 20) 22.75px, rgb(140, 20, 0) 33.75px, transparent 33.75px),
+    linear-gradient(-45deg, rgb(160, 40, 20) 5.75px, transparent 5.75px, transparent 17px, rgb(160, 40, 20) 17px, rgb(160, 40, 20) 28.25px,transparent 28.25px,transparent 38.5px, rgb(100, 20, 0) 38.5px);
+    background-color:rgb(140, 20, 0);
+    background-size: 32px 32px;
+}
+
+.opponent-board-wrapper .game-square.crevasse {
+    background-color: #6d695c;
+    background-image:
+    repeating-linear-gradient(120deg, rgba(255,255,255,.1), rgba(255,255,255,.1) 1px, transparent 1px, transparent 60px),
+    repeating-linear-gradient(60deg, rgba(255,255,255,.1), rgba(255,255,255,.1) 1px, transparent 1px, transparent 60px),
+    linear-gradient(60deg, rgba(0,0,0,.1) 25%, transparent 25%, transparent 75%, rgba(0,0,0,.1) 75%, rgba(0,0,0,.1)),
+    linear-gradient(120deg, rgba(0,0,0,.1) 25%, transparent 25%, transparent 75%, rgba(0,0,0,.1) 75%, rgba(0,0,0,.1));
+    background-size: 2vw 4vw;
+    cursor: default;
+    border-color: rgb(109, 105, 92);
+}
+
+.opponent-board-wrapper .game-square.monster {
+    background-color: rgb(180, 140, 240);
+}
+
+.opponent-board-wrapper .game-square.mountain {
+    background-color: rgb(80, 120, 140);
+    border: solid 1px rgb(140, 148, 143);
+}
+
+.opponent-board-wrapper .game-square.ruins::after {
+    background-image: none;
+    content: '%';
+    color: rgb(220, 230, 255);
+    display: block;
+    position: absolute;
+    font-size: 1vw;
+    opacity: 0.2;
+    font-family: sans-serif;
+    top: 0.3vw;
+    left: 0.3vw;
+    font-weight: bold;
+}
+
+.opponent-board-wrapper .game-square.mountain::after {
+    display: none;
+}
+
+
+/* ============ OPPONENT BOARD -- HOVER COLORS ==================== */
+
+
+
+.opponent-board-wrapper:hover .game-square.forest {
+    background-color: rgb(110, 205, 130);
+    background-image: repeating-radial-gradient( circle at 0.5em 0.5em, rgb(90, 195, 110), rgb(90, 195, 110) 0.1em, transparent 0.11em, transparent 0.45em, rgb(90, 195, 110) 0.46em);
+}
+
+.opponent-board-wrapper:hover .game-square.river {
+    background-color: rgb(120 160 205);
+}
+
+.opponent-board-wrapper:hover .game-square.field {
+    background-color: rgb(250, 190, 110);
+}
+
+.opponent-board-wrapper:hover .game-square.town {
+    background:
+    linear-gradient(45deg, rgb(220, 100, 80) 11.25px, transparent 11.25px) 16px 16px,
+    linear-gradient(45deg, rgb(220, 100, 80) 11.25px, transparent 11.25px,transparent 22.75px, rgb(200, 80, 60) 22.75px, rgb(200, 80, 60) 33.75px, transparent 33.75px),
+    linear-gradient(-45deg, rgb(220, 100, 80) 5.75px, transparent 5.75px, transparent 17px, rgb(220, 100, 80) 17px, rgb(220, 100, 80) 28.25px,transparent 28.25px,transparent 38.5px, rgb(220, 100, 80) 38.5px);
+    background-color:rgb(200, 80, 60);
+}
+
+.opponent-board-wrapper:hover .game-square.crevasse {
+    background-color: #6d695c;
+    background-image:
+    repeating-linear-gradient(120deg, rgba(255,255,255,.1), rgba(255,255,255,.1) 1px, transparent 1px, transparent 60px),
+    repeating-linear-gradient(60deg, rgba(255,255,255,.1), rgba(255,255,255,.1) 1px, transparent 1px, transparent 60px),
+    linear-gradient(60deg, rgba(0,0,0,.1) 25%, transparent 25%, transparent 75%, rgba(0,0,0,.1) 75%, rgba(0,0,0,.1)),
+    linear-gradient(120deg, rgba(0,0,0,.1) 25%, transparent 25%, transparent 75%, rgba(0,0,0,.1) 75%, rgba(0,0,0,.1));
+    background-size: 2vw 4vw;
+    cursor: default;
+    border-color: rgb(109, 105, 92);
+}
+
+.opponent-board-wrapper:hover .game-square.monster {
+    background-color: rgb(180, 140, 240);
+}
+
+.opponent-board-wrapper:hover .game-square.mountain {
+    background-color: rgb(170, 160, 140);
+    border: solid 1px rgb(220, 218, 213);
+}
+
+.opponent-board-wrapper:hover .game-square.ruins::after {
+    opacity: 0.4;
+}
+
+
+
+
+/* =============== FEATURED BOARD ===================== */
+
+.featured-board-modal {
+    position: absolute;
+    display: none;
+    opacity: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 80;
+    pointer-events: none;
+}
+
+.modal-background {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: rgba(250, 250, 250, 0.9);
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 500ms;
+}
+
+.featured-board-modal .terrain-wrap {
+    width: 80vw;
+    padding: 2vw 4vw 1vw 4vw;
+    opacity: 0;
+    transition: opacity 300ms;
+}
+
+.featured-board-modal .terrain-wrap .terrain-type {
+    display: none;
+}
+
+.featured-board-modal .featured-player-location {
+    opacity: 0;
+    transition: opacity 300ms;
+}
+
+
+.featured-board-modal .terrain-wrap .terrain-type.terrain-monster {
+    display: block;
+}
+
+.featured-board-frame-background {
+    z-index: 16;
+    background: rgb(250, 250, 250);
+    border-radius: 4px;
+    position: absolute;
+    top: 9vw;
+    right: 6vw;
+    bottom: 6vw;
+    left: 6vw;
+    opacity: 0;
+    transition: opacity 300ms;
+}
+
+.featured-board-frame {
+    z-index: 20;
+    background: none;
+    border-radius: 4px;
+    position: absolute;
+    top: 9vw;
+    right: 6vw;
+    bottom: 6vw;
+    left: 6vw;
+}
+
+.featured-board-location {
+    transform: scale(0.8);
+}
+
+
+.featured-board-modal .board-wrap {
+    transform-origin: 0 0; 
+    transition: none;
+}
+
+
+
+/* ===== FEATURE MODAL - TRANSITION IN OUT ============= */
+
+.featured-board-modal.show {
+    display: flex;
+}
+.featured-board-modal.opaque {
+    opacity: 1;
+}
+
+
+.featured-board-modal.translate-shifting .board-wrap {
+    transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.featured-board-modal.translate-arrived {
+    pointer-events: all;
+}
+
+.featured-board-modal.translate-arrived .featured-board-frame-background {
+    opacity: 1;
+}
+
+.featured-board-modal.translate-arrived .modal-background {
+    opacity: 1;
+}
+
+.featured-board-modal.translate-arrived .terrain-wrap {
+    opacity: 1;
+} 
+
+.featured-board-modal.translate-arrived .featured-player-location {
+    opacity: 1;
+}
+
+
+
+
+
+
+
+
+
+
+
+

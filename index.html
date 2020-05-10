@@ -3,12 +3,8 @@
 <head>
     <title>Cartographers</title>
     <meta charset="utf-8"/>
-    <link rel="stylesheet" href="style.css" type="text/css">
-    <script type="text/javascript" src="ispin.js"></script>
-    <script type="text/javascript" src="app.js"></script>
-    <script type="text/javascript">
-
-    </script>
+    <link rel="stylesheet" href="style/style.css" type="text/css">
+    <link rel="stylesheet" href="style/style-players.css" type="text/css">
 </head>
 
 <body>
@@ -19,18 +15,54 @@
             <div class="question">Switch boards?</div>
             <div class="confirm-wrap">
                 <div class="confirm-inner confirm-a">
-                    <div class="confirm-button yes">Yes</div>
-                    <div class="confirm-button no">No</div>
+                    <div class="confirm-button yes">Yes</div><div class="confirm-button no">No</div>
                 </div>
                 <div class="confirm-inner confirm-b">
-                    <div class="confirm-button yes">Yes</div>
-                    <div class="confirm-button no">No</div>
+                    <div class="confirm-button yes">Yes</div><div class="confirm-button no">No</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="featured-board-modal" id="featured-board-A">
+        <div class="modal-background"></div>
+        <div class="featured-board-frame-background"></div>
+        <div class="featured-board-frame">
+            <div class="terrain-wrap">
+                <div class="terrain-type terrain-forest active" data-terrain="forest"><div class="terrain-inner"></div></div>
+                <div class="terrain-type terrain-field" data-terrain="field"><div class="terrain-inner"></div></div>
+                <div class="terrain-type terrain-river" data-terrain="river"><div class="terrain-inner"></div></div>
+                <div class="terrain-type terrain-town" data-terrain="town"><div class="terrain-inner"></div></div>
+                <div class="terrain-type terrain-monster" data-terrain="monster"><div class="terrain-inner"></div></div>
+            </div>
+            
+            <div class="featured-player-location">
+                <div class="label">Player:</div>
+                <div class="featured-player-id" id="featured-player-target"></div>
+            </div>
+            
+            <div class="featured-board-location" id="featured-board-target"></div>
+        </div>
+    </div>
+    
+    <div class="game-container" id="game-container-A">
+        <div class="game-inner-wrap">
+            <div class="game-frame" id="game-frame-A"></div>
+        </div>
+        <div class="game-container-controls">
+            <div class="game-container-controls-inner">
+                <div class="info" id="game-container-controls-A">
+                    <div class="player-id"></div><div class="game-id"></div>
+                </div>
+                <div class="buttons">
+                    <div class="collapse-button" id="collapse-button-A">Hide Players</div>
+                    <div class="expand-button" id="expand-button-A">See Players</div>
                 </div>
             </div>
         </div>
     </div>
 
-	<div class="page-container">
+	<div class="page-container" id="page-container-A">
 
         <div class="modal-panel-about" id="about-panel">
             <div class="modal-about-info">
@@ -45,28 +77,57 @@
     
 
         <div class="title-wrap">
-            <div class="letter">C</div>
-            <div class="letter">A</div>
-            <div class="letter">R</div>
-            <div class="letter">T</div>
-            <div class="letter">O</div>
-            <div class="letter">G</div>
-            <div class="letter">R</div>
-            <div class="letter">A</div>
-            <div class="letter">P</div>
-            <div class="letter">H</div>
-            <div class="letter">E</div>
-            <div class="letter">R</div>
+            <div class="letter">C</div><div class="letter">A</div><div class="letter">R</div><div class="letter">T</div>
+            <div class="letter">O</div><div class="letter">G</div><div class="letter">R</div><div class="letter">A</div>
+            <div class="letter">P</div><div class="letter">H</div><div class="letter">E</div><div class="letter">R</div>
             <div class="letter" style="margin-right: -2vw;">S</div>
             <div class="about-link"><span class="question">?</span><span class="x-close">X</span></div>
         </div>
         
-        
         <div class="terrain-wrap">
-            <div class="a-b-selector-wrap">
-                <div class="a-b-selector">
-                    <div class="a-b-choice choice-a" id="selector-choice-a">A</div>
-                    <div class="a-b-choice choice-b" id="selector-choice-b">B</div>
+
+            <div class="join-game-controls">
+                <div class="menu-button join" id="overview-button">JOIN</div>
+                <div class="panel-anchor">
+                    <div class="panel" id="network-overview">
+    
+                        <div class="join-game-inputs" id="join-game-inputs-A">
+                            <div class="join-game-input-wrap">
+                                <div class="label">Your Name</div>
+                                <div class="error" id="player-name-input-error">Min 3 letters</div>
+                                <input type="search" class="join-game-input" id="player-name-input" />
+                            </div>
+                            <div class="join-game-input-wrap">
+                                <div class="label">Game Name</div>
+                                <div class="error" id="game-id-input-error">Min 3 letters</div>
+                                <input type="search" class="join-game-input" id="game-id-input" />
+                            </div>
+                            <div class="join-button" disabled="true" id="join-button-A">Join Game</div>
+                        </div>
+                        
+                        <div class="cancel-pending-wrap" id="pending-cancel-wrap">
+                            <div class="message">Waiting to join
+                                "<span class="game-id"></span>"
+                            </div>
+                            <div class="join-button"  id="cancel-join">Cancel</div>
+                        </div>
+
+                        <div class="create-new-game">
+                            <div class="message">
+                                "<span class="message-game-id" id="message-new-game-id"></span>" 
+                                is a new game.
+                                <br /><br />
+                                Use game board A or B?
+                            </div>
+
+                            <div class="a-b-selector">
+                                <div class="a-b-choice choice-a" id="selector-choice-a">A</div>
+                                <div class="a-b-choice choice-b" id="selector-choice-b">B</div>
+                                <div class="a-b-choice choice-cancel" id="selector-choice-cancel">CANCEL</div>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
             </div>
             
@@ -84,325 +145,23 @@
             <div class="terrain-type terrain-ruins" data-terrain="ruins"><div class="terrain-inner"></div></div>
         </div>
         
-        <div class="board-wrap">
-            
-                <div class="row" id="row_a">
-                    <div class="cell label">A</div>
-                    <div class="cell game-square" id="row_a_cell_1"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_a_cell_2"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_a_cell_3"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_a_cell_4"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_a_cell_5"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_a_cell_6"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_a_cell_7"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_a_cell_8"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_a_cell_9"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_a_cell_10"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_a_cell_11"><div class="inner"></div></div>
-                </div>
-                <div class="row" id="row_b">
-                    <div class="cell label">B</div>
-                    <div class="cell game-square" id="row_b_cell_1"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_b_cell_2"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_b_cell_3"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_b_cell_4"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_b_cell_5"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_b_cell_6"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_b_cell_7"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_b_cell_8"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_b_cell_9"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_b_cell_10"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_b_cell_11"><div class="inner"></div></div>
-                </div>
-                <div class="row" id="row_c">
-                    <div class="cell label">C</div>
-                    <div class="cell game-square" id="row_c_cell_1"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_c_cell_2"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_c_cell_3"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_c_cell_4"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_c_cell_5"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_c_cell_6"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_c_cell_7"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_c_cell_8"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_c_cell_9"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_c_cell_10"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_c_cell_11"><div class="inner"></div></div>
-                </div>
-                <div class="row" id="row_d">
-                    <div class="cell label">D</div>
-                    <div class="cell game-square" id="row_d_cell_1"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_d_cell_2"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_d_cell_3"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_d_cell_4"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_d_cell_5"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_d_cell_6"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_d_cell_7"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_d_cell_8"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_d_cell_9"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_d_cell_10"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_d_cell_11"><div class="inner"></div></div>
-                </div>
-                <div class="row" id="row_e">
-                    <div class="cell label">E</div>
-                    <div class="cell game-square" id="row_e_cell_1"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_e_cell_2"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_e_cell_3"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_e_cell_4"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_e_cell_5"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_e_cell_6"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_e_cell_7"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_e_cell_8"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_e_cell_9"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_e_cell_10"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_e_cell_11"><div class="inner"></div></div>
-                </div>
-                <div class="row" id="row_f">
-                    <div class="cell label">F</div>
-                    <div class="cell game-square" id="row_f_cell_1"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_f_cell_2"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_f_cell_3"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_f_cell_4"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_f_cell_5"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_f_cell_6"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_f_cell_7"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_f_cell_8"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_f_cell_9"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_f_cell_10"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_f_cell_11"><div class="inner"></div></div>
-                </div>
-                <div class="row" id="row_g">
-                    <div class="cell label">G</div>
-                    <div class="cell game-square" id="row_g_cell_1"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_g_cell_2"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_g_cell_3"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_g_cell_4"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_g_cell_5"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_g_cell_6"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_g_cell_7"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_g_cell_8"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_g_cell_9"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_g_cell_10"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_g_cell_11"><div class="inner"></div></div>
-                </div>
-                <div class="row" id="row_h">
-                    <div class="cell label">H</div>
-                    <div class="cell game-square" id="row_h_cell_1"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_h_cell_2"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_h_cell_3"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_h_cell_4"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_h_cell_5"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_h_cell_6"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_h_cell_7"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_h_cell_8"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_h_cell_9"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_h_cell_10"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_h_cell_11"><div class="inner"></div></div>
-                </div>
-                <div class="row" id="row_i">
-                    <div class="cell label">I</div>
-                    <div class="cell game-square" id="row_i_cell_1"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_i_cell_2"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_i_cell_3"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_i_cell_4"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_i_cell_5"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_i_cell_6"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_i_cell_7"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_i_cell_8"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_i_cell_9"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_i_cell_10"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_i_cell_11"><div class="inner"></div></div>
-                </div>
-                <div class="row" id="row_j">
-                    <div class="cell label">J</div>
-                    <div class="cell game-square" id="row_j_cell_1"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_j_cell_2"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_j_cell_3"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_j_cell_4"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_j_cell_5"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_j_cell_6"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_j_cell_7"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_j_cell_8"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_j_cell_9"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_j_cell_10"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_j_cell_11"><div class="inner"></div></div>
-                </div>
-                <div class="row" id="row_k">
-                    <div class="cell label">K</div>
-                    <div class="cell game-square" id="row_k_cell_1"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_k_cell_2"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_k_cell_3"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_k_cell_4"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_k_cell_5"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_k_cell_6"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_k_cell_7"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_k_cell_8"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_k_cell_9"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_k_cell_10"><div class="inner"></div></div>
-                    <div class="cell game-square" id="row_k_cell_11"><div class="inner"></div></div>
-                </div>
-                <div class="row numbers-row" id="row_labels">
-                    <div class="cell label no-corner"> </div>
-                    <div class="cell number-label" id="row_labels_cell_1">1</div>
-                    <div class="cell number-label" id="row_labels_cell_2">2</div>
-                    <div class="cell number-label" id="row_labels_cell_3">3</div>
-                    <div class="cell number-label" id="row_labels_cell_4">4</div>
-                    <div class="cell number-label" id="row_labels_cell_5">5</div>
-                    <div class="cell number-label" id="row_labels_cell_6">6</div>
-                    <div class="cell number-label" id="row_labels_cell_7">7</div>
-                    <div class="cell number-label" id="row_labels_cell_8">8</div>
-                    <div class="cell number-label" id="row_labels_cell_9">9</div>
-                    <div class="cell number-label" id="row_labels_cell_10">10</div>
-                    <div class="cell number-label" id="row_labels_cell_11">11</div>
-                </div>
-            
-            </div>
+        <div id="board-location"></div>
         
-            <div class="gold-coins-wrap" id="gold-coins-wrapper">
-                <div class="gold-coin"><div class="inner"></div></div>
-                <div class="gold-coin"><div class="inner"></div></div>
-                <div class="gold-coin"><div class="inner"></div></div>
-                <div class="gold-coin"><div class="inner"></div></div>
-                <div class="gold-coin"><div class="inner"></div></div>
-                <div class="gold-coin"><div class="inner"></div></div>
-                <div class="gold-coin"><div class="inner"></div></div>
-                <div class="gold-coin"><div class="inner"></div></div>
-                <div class="gold-coin"><div class="inner"></div></div>
-                <div class="gold-coin"><div class="inner"></div></div>
-                <div class="gold-coin"><div class="inner"></div></div>
-                <div class="gold-coin"><div class="inner"></div></div>
-                <div class="gold-coin"><div class="inner"></div></div>
-                <div class="gold-coin"><div class="inner"></div></div>
-            </div>
+        <div class="gold-coins-wrap" id="gold-coins-wrapper"></div>
         
-            <div class="score-cards-wrap">
-
-                <div class="score-card" id="score-card-spring" data-season="spring">
-                    <div class="score-card-title">Spring</div>
-                    <div class="score-card-left">
-                        <div class="score-row  row-1">
-                            <div class="score-field score-field-a">
-                                <input class="score-input score-field-a-input" 
-                                       type="number" min="0" pattern="[0-9]*" inputmode="numeric" />
-                            </div>
-                            <div class="score-field score-field-b">
-                                <input class="score-input score-field-b-input" 
-                                       type="number" min="0" pattern="[0-9]*" inputmode="numeric" />
-                            </div>
-                        </div>
-                        <div class="score-row row-2">
-                            <div class="score-field score-field-gold">
-                                <input class="score-input score-gold-input" 
-                                       type="number" min="0" pattern="[0-9]*" inputmode="numeric" />
-                            </div>
-                            <div class="score-field score-field-monsters">
-                                <input class="score-input score-monsters-input" 
-                                       type="number" max="0" pattern="[0-9]*" inputmode="numeric" />                                
-                            </div>
-                        </div>
-                    </div>
-                    <div class="score-card-right">
-                        <div class="score-result"></div>
-                    </div>
-                </div>
-
-                <div class="score-card" id="score-card-summer" data-season="summer">
-                    <div class="score-card-title">Summer</div>
-                    <div class="score-card-left">
-                        <div class="score-row  row-1">
-                            <div class="score-field score-field-a">
-                                <input class="score-input score-field-a-input" 
-                                       type="number" min="0" pattern="[0-9]*" inputmode="numeric" />
-                            </div>
-                            <div class="score-field score-field-b">
-                                <input class="score-input score-field-b-input" 
-                                       type="number" min="0" pattern="[0-9]*" inputmode="numeric" />
-                            </div>
-                        </div>
-                        <div class="score-row row-2">
-                            <div class="score-field score-field-gold">
-                                <input class="score-input score-gold-input" 
-                                       type="number" min="0" pattern="[0-9]*" inputmode="numeric" />
-                            </div>
-                            <div class="score-field score-field-monsters">
-                                <input class="score-input score-monsters-input" 
-                                       type="number" max="0" pattern="[0-9]*" inputmode="numeric" />                                
-                            </div>
-                        </div>
-                    </div>
-                    <div class="score-card-right">
-                        <div class="score-result"></div>
-                    </div>
-                </div>
-
-
+        <div class="score-cards-wrap" id="score-cards-section"></div>
                 
-                <div class="score-card" id="score-card-fall" data-season="fall">
-                    <div class="score-card-title">Fall</div>
-                    <div class="score-card-left">
-                        <div class="score-row  row-1">
-                            <div class="score-field score-field-a">
-                                <input class="score-input score-field-a-input" 
-                                       type="number" min="0" pattern="[0-9]*" inputmode="numeric" />
-                            </div>
-                            <div class="score-field score-field-b">
-                                <input class="score-input score-field-b-input" 
-                                       type="number" min="0" pattern="[0-9]*" inputmode="numeric" />
-                            </div>
-                        </div>
-                        <div class="score-row row-2">
-                            <div class="score-field score-field-gold">
-                                <input class="score-input score-gold-input" 
-                                       type="number" min="0" pattern="[0-9]*" inputmode="numeric" />
-                            </div>
-                            <div class="score-field score-field-monsters">
-                                <input class="score-input score-monsters-input" 
-                                       type="number"max="0" pattern="[0-9]*" inputmode="numeric"  />                                
-                            </div>
-                        </div>
-                    </div>
-                    <div class="score-card-right">
-                        <div class="score-result"></div>
-                    </div>
-                </div>
+    </div> <! --- END page-container -->
 
 
-                <div class="score-card" id="score-card-winter" data-season="winter">
-                    <div class="score-card-title">Winter</div>
-                    <div class="score-card-left">
-                        <div class="score-row  row-1">
-                            <div class="score-field score-field-a">
-                                <input class="score-input score-field-a-input" 
-                                       type="number" min="0" pattern="[0-9]*" inputmode="numeric" />
-                            </div>
-                            <div class="score-field score-field-b">
-                                <input class="score-input score-field-b-input" 
-                                       type="number" min="0" pattern="[0-9]*" inputmode="numeric" />
-                            </div>
-                        </div>
-                        <div class="score-row row-2">
-                            <div class="score-field score-field-gold">
-                                <input class="score-input score-gold-input" 
-                                       type="number" min="0" pattern="[0-9]*" inputmode="numeric" />
-                            </div>
-                            <div class="score-field score-field-monsters">
-                                <input class="score-input score-monsters-input" 
-                                       type="number" max="0" pattern="[0-9]*" inputmode="numeric" />                                
-                            </div>
-                        </div>
-                    </div>
-                    <div class="score-card-right">
-                        <div class="score-result"></div>
-                    </div>
-                </div>
-                
-                <div class="final-score-card">
-                    <div class="score-card-title">Final</div>
-                    <div class="final-score-result" id="final-score"></div>
-                </div>
-
-                
-            </div>
-	    </div>
+    <script type="text/javascript" src="js/ispin.js"></script>
+    <!--
+    <script type="text/javascript" src="fingerprint2-min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-database.js"></script>
+    -->
+    <script type="text/javascript" src="js/app-local.js"></script>
+    <script type="text/javascript" src="js/app.js"></script>
 
 </body>
 </html>

@@ -5,6 +5,7 @@ html * {
 
 body {
     margin: 0;
+    background: rgb(250, 250, 250);
 }
 
 .page-container {
@@ -12,8 +13,9 @@ body {
     flex-wrap: wrap;
     justify-content: space-around;
     overflow: hidden;
+    transition: transform 700ms;
+    position: relative;
 }
-
 
 .title-wrap {
     padding: 1vw 2vw 3vw 5vw;
@@ -23,6 +25,7 @@ body {
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
+    transition: opacity 400ms;
 }
 
 .title-wrap .letter {
@@ -71,35 +74,269 @@ body {
 }
 
 /* ========== A-B BOARD CHOOSER =========================== */
+.join-game-controls {
+    width: 28vw;
+    position: relative;
+    z-index: 20;
+    padding: 1.3vw 0 0 0;
+}
+
+.join-game-controls .panel-anchor {
+    height: 1px;
+    width: 100%;
+    overflow: visible;
+    position: relative;
+}
+
+.join-game-controls .menu-button {
+    width: 18vw;
+    height: 4vw;
+    position: relative;
+    border: solid 1px rgb(120, 120, 120);
+    border-radius: 2px;
+    opacity: 0.7;
+    color: rgb(70, 70, 70);
+    font-size: 2vw;
+    cursor: pointer;
+    padding: 0.8vw 0 0 0;
+    letter-spacing: 0.1em;
+    text-align: center;
+    transition: width 300ms, height 300ms, margin 300ms, border-radius 300ms;
+}
+
+
+
+.pending-icon {
+    background-image: url(/images/git-commit.svg);
+    background-size: 2.4vw 2.4vw;
+    position: absolute;
+    display: block;
+    top: 0.7vw;
+    right: 1.2vw;
+    width: 2.4vw;
+    height: 2.4vw;
+    opacity: 0.7;
+
+    -webkit-transition-property: -webkit-transform;
+    -moz-transition-property: -moz-transform;
+    -o-transition-property: -o-transform;
+     transition-property: transform;
+
+     overflow:hidden;
+    -webkit-animation:spin 2s linear infinite;
+    -moz-animation:spin 2s linear infinite;
+    animation:spin 2s linear infinite;
+}
+
+@-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
+@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
+
+.change-settings-button {
+    background-image: url(/images/ionicons-git-compare.svg);
+    background-size: 2.4vw 2.4vw;
+    position: absolute;
+    display: block;
+    top: 0.7vw;
+    right: 1.2vw;
+    width: 2.4vw;
+    height: 2.4vw;
+    opacity: 0.7;
+}
+
+.join-game-controls .menu-button .data {
+    display: flex;
+    justify-content: space-around;
+    font-size: 2vw;
+    padding: 0;
+    margin: 0 0 0 -2vw;
+}
+
+.join-game-controls .menu-button.active {
+    width: 24vw;
+    letter-spacing: 0.05em;
+    background-color: rgb(255, 246, 160);
+}
+
+.join-game-controls .menu-button.pending {
+    background: rgb(230, 245, 250);
+    width: 24vw;
+}
+
+.join-game-controls .menu-button.pending .pending-message {
+    font-size: 2vw;
+    letter-spacing: 0;
+    padding: 0 2vw 0 0;
+}
+
+.join-game-controls .menu-button:hover {
+    opacity: 1;
+    color: rgb(0, 0, 0);
+}
+
+
+.join-game-controls .menu-button.join {
+    background: rgb(225, 255, 200);
+}
+.join-game-controls .menu-button.join:hover {
+    background: rgb(205, 255, 170);
+}
+
+.join-game-controls .menu-button:hover .change-settings-button {
+    opacity: 1;
+}
+
+.join-game-controls .panel {
+    display: none;
+    opacity: 0;
+    transition: opacity 300ms ease-out, transform 300ms ease-out;
+    transform-origin: 20% 0;
+    transform: scale(0.5, 0.5) translate(-10px, -10px);
+    position: absolute;
+    z-index: 20;
+    top: 0.1vw;
+    left: -0.8vw;
+    background: rgb(250, 250, 250);
+    border-radius: 2px;
+    box-shadow: 4px 4px 4vw rgba(0, 0, 0, 0.15);
+    padding: 2vw 3vw;
+}
+
+.join-game-controls .panel.show { display: block; }
+.join-game-controls .panel.opaque { 
+    opacity: 1; 
+    transform: scale(1, 1)  translate(0, -6px);
+}
+
+.join-game-inputs {
+    padding: 1vw 0 0 0;
+}
+.join-game-inputs.hidden {
+    display: none;
+}
+
+.join-game-inputs.disabled {
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+.join-game-input-wrap {
+    position: relative;
+    margin: 0 0 2vw 0;
+}
+
+.join-game-input-wrap .label {
+    font-size: calc(10px + 0.7vw);
+    color: rgb(140, 140, 140);
+    letter-spacing: 0.05em;
+    margin: 8px 0 2px 8px;
+    line-height: 1;
+    font-family: sans-serif;
+}
+.join-game-input-wrap .error {
+    position: absolute;
+    top: 0;
+    right: 0vw;
+    font-size: calc(8px + 0.6vw);
+    color: rgb(230, 80, 0);
+    text-transform: uppercase;
+    display: none;
+    font-family: sans-serif;
+    font-weight: bold;
+}
+
+.join-game-input-wrap .error.show {
+    display: block;
+}
+
+.join-game-input {
+    font-size: calc(10px + 1.6vw);
+    padding: 0.6vw 1vw;
+    margin: 6px 0 1px 1px;
+    border: solid 1px rgb(180, 180, 180);
+    color: rgb(70, 70, 70);
+}
+
+.join-game-input:focus {
+    outline: none !important;
+    margin: 5px 0 0 0;
+    border-width: 2px;
+}
+
+.join-button {
+    font-size: calc(10px + 1vw);
+    width: 20vw;
+    margin: 3vw 0;
+    padding: 1vw 3vw;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-radius: 2px;
+    cursor: pointer;
+    background: rgb(255, 255, 255);
+    box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.1);
+    transition: opacity 200ms;
+    border: solid 1px rgb(230, 180, 160);
+}
+
+.join-button:hover {
+    opacity: 1;
+}
+
+.join-button:disabled,
+.join-button[disabled] {
+    opacity: 0.3;
+    cursor: default;
+    border-color: transparent;
+}
+
+.cancel-pending-wrap {
+    padding: 1vw 0 1vw 0;
+    display: none;
+}
+
+.cancel-pending-wrap.show {
+    display: block;
+}
+
+.create-new-game {
+    margin: 0 0 2vw 0;
+    display: none;
+}
+
+.create-new-game .message {
+    font-size: calc(10px + 1vw);
+    margin: 3vw 0 0 0;
+    padding: 3vw 4vw 2vw 4vw;
+    border: solid rgb(180, 180, 180);
+    border-width: 1px 0 0 0;
+}
 
 .a-b-selector-wrap {
-    width: 24vw;
-    height: 7vw;
-    padding: 1vw 0 0 0;
 }
 
 .a-b-selector {
-    border: solid 1px rgb(120, 120, 120);
+    border: solid 1px rgb(180, 180, 180);
     border-radius: 2px;
-    color: rgb(100, 100, 100);
     display: flex;
-    width: 14vw;
+    justify-content: space-around;
+    font-size: 3vw;
 }
 
 .a-b-choice {
     border: solid rgb(180, 180, 180);
     background-color: rgb(250, 250, 250);
     border-width: 0;
-    width: 50%;
     height: 4.6vw;
-    padding: 0.6vw 0 0 0;
+    padding: 0.6vw 1vw 0 1vw;
     text-align: center;
-    font-size: 3vw;
     cursor: pointer;
+    flex-grow: 2;
+    opacity: 0.7;
 }
 
 .a-b-choice:hover {
-    opacity: 0.7;
+    opacity: 1;
+    background: rgb(240, 245, 255);
 }
 
 .a-b-choice.active {
@@ -107,8 +344,25 @@ body {
     color: rgb(120, 70, 50);
 }
 
+.a-b-choice.active:hover {
+    background-color: rgb(255, 246, 160);
+}
+
 .a-b-choice.choice-a {
     border-width: 0 1px 0 0;
+}
+.a-b-choice.choice-cancel {
+    border-width: 0 0 0 1px;
+    font-size: 0.5em;
+    padding-top: 1.5vw;
+    letter-spacing: 0.1em;
+    font-family: sans-serif;
+    color: rgb(180, 80, 0);
+    font-weight: bold;
+}
+
+.a-b-choice.choice-cancel:hover {
+    background: rgb(255, 230, 200);
 }
 
 
@@ -116,7 +370,7 @@ body {
 /* ========== TERRAIN CHOOSER =========================== */
 
 .terrain-wrap {
-    padding: 2vw 4vw;
+    padding: 2vw 0 2vw 4vw;
     width: 90vw;
     height: 7vw;
     display: flex;
@@ -275,6 +529,7 @@ body {
     font-size: 0.8em;
 }
 
+.test-buttons .confirm-button,
 .modal-panel .confirm-button {
     opacity: 0.6;
     cursor: pointer;
@@ -287,6 +542,8 @@ body {
     transition: opacity 200ms;
 }
 
+
+.test-buttons .confirm-button:hover,
 .modal-panel .confirm-button:hover {
     opacity: 1;
 }
@@ -415,7 +672,7 @@ input.score-input:focus {
 .row .cell {
     width: 8.6%;
     height: 100%;
-    border: solid 1px rgb(230, 230, 230);
+    border: solid 1px rgb(220, 218, 213);
 }
 
 .row .cell.label.no-corner {
@@ -446,7 +703,7 @@ input.score-input:focus {
 .game-square {
     position: relative;
     cursor: pointer;
-    background-color: rgb(245, 245, 245);
+    background-color: rgb(240, 238, 233);
     transition: opacity 160ms;
 }
 
@@ -512,7 +769,7 @@ input.score-input:focus {
 }
 
 .terrain-ruins .terrain-inner::after {
-    background-image: url(ruins.svg);
+    background-image: url(/images/ruins.svg);
     background-size: 2.6vw 2.8vw;
     display: inline-block;
     width: 2.6vw;
@@ -524,7 +781,7 @@ input.score-input:focus {
 }
 
 .game-square.ruins::after {
-    background-image: url(ruins.svg);
+    background-image: url(/images/ruins.svg);
     background-size: 4.8vw 5vw;
     display: inline-block;
     width: 4.8vw;
@@ -536,13 +793,13 @@ input.score-input:focus {
     opacity: 0.2;     
 }
 
-.mountain,
+.game-square.mountain,
 .terrain-mountain {
     background-color: rgb(190, 180, 160);
 }
 
 .terrain-mountain .terrain-inner::after {
-    background-image: url(mountain.svg);
+    background-image: url(/images/mountain.svg);
     background-size: 3.5vw 3.4vw;
     display: inline-block;
     width: 3.6vw;
@@ -555,7 +812,7 @@ input.score-input:focus {
 }
 
 .game-square.mountain::after {
-    background-image: url(mountain.svg);
+    background-image: url(/images/mountain.svg);
     background-size: 5.3vw 5vw;
     display: inline-block;
     width: 5.3vw;
@@ -568,7 +825,7 @@ input.score-input:focus {
 }
 
 .terrain-wrap .terrain-monster .terrain-inner::before {
-    background-image: url(monster.svg);
+    background-image: url(/images/monster.svg);
     background-size: 3.5vw 3.4vw;
     display: inline-block;
     width: 3.6vw;
@@ -579,8 +836,9 @@ input.score-input:focus {
     left: 0.65vw;
     opacity: 0.6;       
 }
+
 .game-square.monster::before {
-    background-image: url(monster.svg);
+    background-image: url(/images/monster.svg);
     background-size: 5.5vw 5.4vw;
     display: inline-block;
     width: 5.6vw;
@@ -598,7 +856,7 @@ input.score-input:focus {
 }
 
 .score-field-monsters::after {
-    background-image: url(monster.svg);
+    background-image: url(/images/monster.svg);
     background-size: 5.5vw 5.4vw;
     display: inline-block;
     width: 5.6vw;
@@ -624,7 +882,24 @@ input.score-input:focus {
     display: block;
 }
 
+/* ======= NETWORK GAME PANEL -- REST OF PAGE EFFECTED ============= */
+
+.network-game-active .page-container {
+    transform: translate(0, 6vw);
+}
+
+.network-game-active.network-game-open .page-container {
+    transform: translate(0, 19vw);
+}
+.network-game-active.network-game-open .page-container .title-wrap {
+    opacity: 0;
+    pointer-events: none;
+}
+
+
+
 /* ======= ispin.js library ========================= */
+
 .score-input::-webkit-outer-spin-button,
 .score-input::-webkit-inner-spin-button {
     -webkit-appearance: none;
@@ -690,6 +965,7 @@ input.score-input {
 .ispin-wrapper .ispin-button.ispin-button-dec:disabled:before {
     border-top-color: grey;
 }
+
 
 
 /* =============== RESPONSIVE ======================= */
