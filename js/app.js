@@ -895,7 +895,7 @@ var loadScripts = (function () {
     };
     
     return function () {
-        loadFile('../js/fingerprint2-min.js', success);
+        loadFile('js/fingerprint2-min.js', success);
     };
 })();
 
