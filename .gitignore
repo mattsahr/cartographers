@@ -1,9 +1,9 @@
 # Ignore all JENKINS_HOME except jobs directory, root xml config, and
 # .gitignore file.
-/*
-!/jobs
-!/.gitignore
-!/*.xml
+# /*
+# !/jobs
+# !/.gitignore
+# !/*.xml
 
 # Ignore all files in jobs subdirectories except for folders.
 # Note: git doesn't track folders, only file content.
@@ -22,9 +22,8 @@ indexing
 # Don't track workspaces (when users build on the master).
 jobs/**/*workspace
 
-
 .eslintrc
 package.json
 package-lock.json
 /dev_local
-
+/node_modules

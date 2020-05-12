@@ -26,6 +26,10 @@ var LOCAL_PLAYER_DEFAULT_ID = 'LOCAL_PLAYER_DEFAULT_ID';
 var methods = window.methods = window.methods || {};
 var uxState = window.uxState = window.uxState || {}; 
 
+
+
+
+
 var createHTML = function (htmlString) {
   var div = document.createElement('div');
   div.innerHTML = htmlString.trim();
@@ -204,6 +208,7 @@ methods.gameSquareListener = (function () {
         
     };
 })();
+
 
 var initGameBoard = function (boardId) {
     document
