@@ -1,10 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
+<!--
+    TODO -- Test methods.cancelPendingJoinUX();
+    TODO -- Create methods.network.cancelPendingJoin(); -- is this identical to network.exitGame() ?
+
+    TODO -- Create methods.exitGameUX();
+    TODO -- Create methods.network.exitGame();
+
+    TODO -- Test the create-my-own-game pathways
+    
+    TODO -- Build a UX for the approveJoiners() interactions
+    TODO -- Build out the onJoinersChange() method
+
+    TODO -- Get a Second player going in another browser
+    TODO -- Test latency on board updates
+
+    TODO -- Hook up the monster button to the featured board
+    TODO -- Test the update-the-opponent network method
+    TODO -- Style the featured board
+
+    TODO -- Make a boot-the-player button, hook it up
+    TODO -- Create the network boot-the-player method
+    TODO -- Build a you-have-left toaster type message
+    
+    TODO -- Consider showing a score for each opponent
+
+ -->
+
 <head>
     <title>Cartographers</title>
     <meta charset="utf-8"/>
     <link rel="stylesheet" href="style/style.css" type="text/css">
     <link rel="stylesheet" href="style/style-players.css" type="text/css">
+    <script type="text/javascript">
+        window.DEBUG = true;
+    </script>
     <script defer type="text/javascript" src="js/ispin.js"></script>
     <script defer type="text/javascript" src="js/app-local.js"></script>
     <script defer type="text/javascript" src="js/app.js"></script>
@@ -31,13 +61,7 @@
         <div class="modal-background"></div>
         <div class="featured-board-frame-background"></div>
         <div class="featured-board-frame">
-            <div class="terrain-wrap">
-                <div class="terrain-type terrain-forest active" data-terrain="forest"><div class="terrain-inner"></div></div>
-                <div class="terrain-type terrain-field" data-terrain="field"><div class="terrain-inner"></div></div>
-                <div class="terrain-type terrain-river" data-terrain="river"><div class="terrain-inner"></div></div>
-                <div class="terrain-type terrain-town" data-terrain="town"><div class="terrain-inner"></div></div>
-                <div class="terrain-type terrain-monster" data-terrain="monster"><div class="terrain-inner"></div></div>
-            </div>
+            <div class="terrain-wrap"></div>
             
             <div class="featured-player-location">
                 <div class="label">Player:</div>
@@ -52,9 +76,9 @@
         <div class="game-inner-wrap">
             <div class="game-frame" id="game-frame-A"></div>
         </div>
-        <div class="game-container-controls">
-            <div class="game-container-controls-inner">
-                <div class="info" id="game-container-controls-A">
+        <div class="game-container-footer">
+            <div class="game-container-footer-inner">
+                <div class="info" id="game-container-footer-A">
                     <div class="player-id"></div><div class="game-id"></div>
                 </div>
                 <div class="buttons">
@@ -65,7 +89,7 @@
         </div>
     </div>
 
-	<div class="page-container" id="page-container-A">
+    <div class="page-container" id="page-container-A">
 
         <div class="modal-panel-about" id="about-panel">
             <div class="modal-about-info">
@@ -73,21 +97,20 @@
 
                 <p><a href="https://www.thunderworksgames.com/cartographers.html">Get the board game</a>.</p>
 
+                <p>This score cards should let you play remotely, with a (zoom, skype, hangouts) call for the actual, 
+                    like, human interaction part -- someone to flip and show the cards, etc.</p>  
+
+                <p>When you "JOIN" a game, you will be able to see the other players' boards, and add monsters to them.</p>
+                
                 <p>Copy or modify on <a href="https://github.com/mattsahr/cartographers">Github</a>.</p>
                 </p>
             </div>
         </div>
     
 
-        <div class="title-wrap">
-            <div class="letter">C</div><div class="letter">A</div><div class="letter">R</div><div class="letter">T</div>
-            <div class="letter">O</div><div class="letter">G</div><div class="letter">R</div><div class="letter">A</div>
-            <div class="letter">P</div><div class="letter">H</div><div class="letter">E</div><div class="letter">R</div>
-            <div class="letter" style="margin-right: -2vw;">S</div>
-            <div class="about-link"><span class="question">?</span><span class="x-close">X</span></div>
-        </div>
+        <div class="title-wrap"></div>
         
-        <div class="terrain-wrap">
+        <div class="terrain-wrap" id="main-terrain-wrap">
 
             <div class="join-game-controls">
                 <div class="menu-button join" id="overview-button">JOIN</div>
@@ -115,6 +138,13 @@
                             <div class="join-button"  id="cancel-join">Cancel</div>
                         </div>
 
+                        <div class="exit-game-wrap" id="game-exit-wrap">
+                            <div class="message">Current game: 
+                                <span class="game-id"></span>
+                            </div>
+                            <div class="join-button"  id="game-exit">Leave Game</div>
+                        </div>
+
                         <div class="create-new-game">
                             <div class="message">
                                 "<span class="message-game-id" id="message-new-game-id"></span>" 
@@ -134,18 +164,6 @@
                 </div>
             </div>
             
-            
-            <div class="terrain-type terrain-forest active" data-terrain="forest"><div class="terrain-inner"></div></div>
-            <div class="terrain-type terrain-field" data-terrain="field"><div class="terrain-inner"></div></div>
-            <div class="terrain-type terrain-river" data-terrain="river"><div class="terrain-inner"></div></div>
-            <div class="terrain-type terrain-town" data-terrain="town"><div class="terrain-inner"></div></div>
-            <div class="terrain-type terrain-monster" data-terrain="monster"><div class="terrain-inner"></div></div>
-
-            <div class="terrain-spacer"><div class="terrain-inner"></div></div>
-
-            <div class="terrain-type terrain-crevasse" data-terrain="crevasse"><div class="terrain-inner"></div></div>
-            <div class="terrain-type terrain-mountain" data-terrain="mountain"><div class="terrain-inner"></div></div>
-            <div class="terrain-type terrain-ruins" data-terrain="ruins"><div class="terrain-inner"></div></div>
         </div>
         
         <div id="board-location"></div>

@@ -1,26 +1,24 @@
 (function () {
 'use strict';
-
-var firebase = null; // = window.firebase; -- replaced when firebase app is loaded
 var console = window.console;
+var firebase = null; // = window.firebase; -- replaced when firebase app is loaded
 var Fingerprint2 = null; // = window.Fingerprint2; -- replaced when Fingerprint2 is async loaded
+var DEBUG = window.DEBUG;
+var LOCAL_PLAYER_DEFAULT_ID = 'LOCAL_PLAYER_DEFAULT_ID';
 
 var methods = window.methods = window.methods || {};
 var uxState = window.uxState = window.uxState || {}; 
-var constants = window.constants = window.constants || {}; 
-
-constants.playTerrains = [ 'forest', 'town', 'river', 'field', 'monster' ];
 
 uxState.currentTerrain = 'forest';
 uxState.currentPlayBoard = 'A';
 uxState.gameBoardStarted = false;
 uxState.showAboutPanel = false;
 
-uxState.players = { byNumber: {}, byId: {} }
+uxState.players = { byNumber: {}, byId: {}, byName: {} }
 uxState.lastOpponentNumber = 0;
 
 uxState.gameState = {
-    // -- TODO -- REMOVE THIS TESTING DATA ---------------
+    playerState: {}
     /*
     boardType: 'A',
     gameId: 'wootang',
@@ -49,7 +47,7 @@ var networkUX = (function () {
     var setLocalPlayer = function (playerName) {
         uxState.localPlayerName = playerName;
         uxState.localPlayerId = playerName + uxState.localPlayerHashId;
-        var gameContainerControls = document.getElementById('game-container-controls-A');
+        var gameContainerControls = document.getElementById('game-container-footer-A');
         var playerEl = gameContainerControls.querySelector('.player-id');
         playerEl.innerHTML = '<span class="label">Player:</span>' + 
                     '<span class="data">' + playerName + '</span>';
@@ -61,47 +59,40 @@ var networkUX = (function () {
         if (!uxState.gameState || (uxState.gameState && uxState.gameState.gameId !== gameId)) {
             uxState.gameState = {
                 gameId: gameId,
-                players: {
+                playerState: {
                     
                 }
             }
         }
         
-        // ---- GAME CONTROLS SUB-HEADER ----------
-        var gameContainerControls = document.getElementById('game-container-controls-A');
+    };
+    
+    var setNetworkFooterUX = function () {
+        var gameId = uxState.gameState.gameId;
+
+        var gameContainerControls = document.getElementById('game-container-footer-A');
         var gameIdEl = gameContainerControls.querySelector('.game-id');
         gameIdEl.innerHTML = '<span class="label">game:</span>' +
-                    '<span class="data">' + gameId + '</span>';
-        
-        // ---- ACION BUTTON ------------------
-        var statusButton = document.getElementById('overview-button');
-        
-        if (gameId) {
-            setNetworkUX('on');
+            '<span class="data">' + gameId + '</span>';
 
-            statusButton.classList.remove('join');
-            statusButton.classList.add('active');
-
-            statusButton.innerHTML = 
-                '<span class="data">' + gameId + '</span>' +
-                '<div class="change-settings-button"></div>';
-        } else {
-            setNetworkUX('off');
-        }
+        var playerEl = gameContainerControls.querySelector('.player-id');
+        playerEl.innerHTML = '<span class="label">Player:</span>' + 
+            '<span class="data">' + uxState.localPlayerName + '</span>';
     };
     
     methods.uponJoinApprovalUX = function () {
-        console.log('     V');
-        console.log('     V');
-        console.log('     |');
-        console.log('     |');
-        console.log('----- PLACE HOLDER ----- uponJoinApprovalUX() --------------');
-        console.log('grab all the players and make boards, dawg');
-        console.log('     |');
-        console.log('     |');
-        console.log('     ^');
-        console.log('     ^');
-        setNetworkUX('on');
+        var gameId = uxState.gameState.gameId;
+        console.log('-------- uponJoinApprovalUX()  ' + gameId + '  --------------');
+
+        if (gameId) {
+            methods.showActiveGameUX();
+            setNetworkFooterUX();
+            setNetworkUX('on');
+
+        } else {
+            setNetworkUX('off');
+        }
+
     };
 
     var setNetworkUX = function(status) {
@@ -140,6 +131,28 @@ var networkUX = (function () {
                 modal2.classList.remove('translate-shifting');
             }, 400)
         }, 10);
+    };
+    
+    methods.destroyFeaturedBoard = function() {
+        var playerId;
+        var target = document.getElementById('featured-board-target');
+            
+        // REMOVE ALL EVENT LISTENERS
+        target.querySelectorAll('.game-square').forEach(function(el) {
+            el.removeEventListener('click', methods.gameSquareListener);
+        });
+        
+        // REMOVE BOARD FROM THE DOM
+        target.innerHTML = '';
+
+        // REMOVE BOARD REFERENCE FROM THE PLAYER
+        // eslint-disable-next-line no-restricted-syntax
+        for (playerId in uxState.players.byId) {
+            if (uxState.players.hasOwnProperty(playerId)) {
+                delete uxState.players.byId[playerId].featuredBoardId;
+            }
+        }
+
     };
     
     methods.featureGalleryBoard = (function (){
@@ -184,17 +197,18 @@ var networkUX = (function () {
         
         return function(playerId, boardId) {
             return function (event) {
-                var playerNo = uxState.players.byId[playerId].localNumber;
-                var playerName = uxState.players.byId[playerId].name;
+                var player = uxState.players.byId[playerId];
                 
                 var galleryBoard = getBoardEl(event.target);
 
                 // BUILD A NEW BOARD USING JUST [playerNo] AS THE BOARD ID
-                var featuredBoard = methods.buildGameBoard(playerNo, 'featured');
-                featuredBoard.setAttribute('id', 'featured-board-' + playerNo);
+                const featuredBoardId = 'featured-board-' + player.localNumber;
+                var featuredBoard = methods.buildGameBoard('featured-board-' + player.localNumber, 'featured');
+                featuredBoard.setAttribute('id', featuredBoardId);
+                player.featuredBoardId = featuredBoardId;
 
                 // PUT A NAME IN THE DISPLAY MODAL
-                document.getElementById('featured-player-target').innerHTML = playerName;
+                document.getElementById('featured-player-target').innerHTML = player.name;
     
                 // PUT THE BOARD IN THE DOM
                 var target  = document.getElementById('featured-board-target');
@@ -211,14 +225,12 @@ var networkUX = (function () {
                 // SET BOARD TYPE A OR B
                 var boardType = uxState.gameState && uxState.gameState.boardType;
                 if (boardType === 'B') {
-                    methods.setupBoardB(featuredBoard, playerNo);
+                    methods.setupBoardB(featuredBoard, 'featured-board-' + player.localNumber);
                 } else {
-                    methods.setupBoardA(featuredBoard, playerNo);
+                    methods.setupBoardA(featuredBoard, 'featured-board-' + player.localNumber);
                 }
     
-                // ADD DATA TO THE BOARD
-                var data = uxState.gameState.players[playerId];
-                populateBoard(playerNo, data);
+                populateBoard(featuredBoardId, playerId);
                 
                 featuredBoardEnter();
             };
@@ -228,7 +240,7 @@ var networkUX = (function () {
     methods.collapseFeaturedModal = function () {
         var modal = document.getElementById('featured-board-A');
         modal.classList.remove('show');
-        // TODO -- REMOVE BOARD, REMOVE EVENT LISTENERS FROM IT
+        methods.destroyFeaturedBoard();
     };
     
     var populateBoard = (function (){
@@ -253,23 +265,51 @@ var networkUX = (function () {
             })
         };
         
-        return function (boardId, data) {
+        return function (boardId, playerId) {
+            var data = uxState.gameState.playerState[playerId];
+            
+                console.groupCollapsed('populateBoard(' + boardId + ', ' + playerId + ')');
+                console.log('data', data);
+                console.log('');
+                console.log('');
+            
+            
+            console.log('player', playerId, 'data', data);
             terrains.forEach(function(terrain) {
                 if (data[terrain]) {
+                    console.log('data[' + terrain + ']', data[terrain]);
                     data[terrain].forEach(function (plot) {
                         var id = 'row_' + rowIndex[plot[1]] + '_cell_' + plot[0] + '_' + boardId;
                         var square = document.getElementById(id);
-                        
-                        removeAllTerrains(square);
-                        square.classList.add(terrain);
+                        if (square) {
+                            removeAllTerrains(square);
+                            square.classList.add(terrain);
+                        } else {
+                            console.log('---- square not found --- ', id);
+                        }
                     });
                 }
             });
+            console.groupEnd();
+
+
         };
         
     })();
+
+    methods.updateAllBoards = function (player) {
+        if (player.galleryBoardId) {
+            populateBoard(player.galleryBoardId, player.id);
+        }
+        if (player.featuredBoardId) {
+            populateBoard(player.featuredBoardId, player.id);
+        }
+        if (player.mainBoardId) {
+            populateBoard(player.mainBoardId, player.id);
+        }
+    };    
     
-    methods.composeDataToUX = function (data) {
+    methods.composeDataToUX = function (sourceData) {
         var playerState = {
             field: [],
             forest: [],
@@ -278,9 +318,11 @@ var networkUX = (function () {
             town: [],
             score: 0
         };
-        if (!data) {
+        if (!sourceData) {
             return playerState;
         }
+        var data = Array.isArray(sourceData) ? sourceData : JSON.parse(sourceData);
+        
         playerState.field = data[0] || [];
         playerState.forest = data[1] || [];
         playerState.monster = data[2] || [];
@@ -302,8 +344,50 @@ var networkUX = (function () {
         return JSON.stringify(data);
     }
     
+    methods.collectDataFromDOM = (function () {
+        function toArray(obj) {
+            var array = [];
+            // iterate backwards ensuring that length is an UInt32
+            for (var i = obj.length >>> 0; i--;) { 
+                array[i] = obj[i];
+            }
+            return array;
+        }
+        var playTerrains = [ 'forest', 'town', 'river', 'field', 'monster' ];
+
+        var letterToNumber = { a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7, h: 8, i: 9, j: 10, k: 11, l: 12 }
+        
+        var getCoordinates = function (idString) {
+            var coord = idString.split('_');
+            return [Number(coord[3]), letterToNumber[coord[1]]];
+        };
+
+        return function (gameBoard) {
+            var gameData = {
+                field: [],
+                forest: [],
+                monster: [],
+                river: [],
+                town: [],
+            };
+
+            var playerId = gameBoard.getAttribute('data-player-id') || uxState.localPlayerId || LOCAL_PLAYER_DEFAULT_ID;
+            gameBoard.querySelectorAll('.game-square').forEach(function(el) {
+                playTerrains.forEach(function (terrain) {
+                    if (toArray(el.classList).indexOf(terrain) !== -1) {
+                        gameData[terrain].push(getCoordinates(el.id));
+                    }
+                });
+            });
+            
+            uxState.gameState.playerState[playerId] = gameData;
+            methods.network.sendPlayerUpdate(playerId);
+            
+        };
+    })();
+    
     methods.updateOpponentDataToUX = function (player) {
-        uxState.gameState.players[player.id] = methods.composeDataToUX(player.data);
+        uxState.gameState.playerState[player.id] = methods.composeDataToUX(player.data);
     };
     
     methods.removePlayer = function (playerId) {
@@ -345,11 +429,6 @@ var networkUX = (function () {
             
             var opponents = document.getElementById('game-frame-A');
             opponents.appendChild(opponent);
-            
-            console.log('children', opponents.childElementCount);
-            console.log('children', opponents.children.length);
-    
-            console.log('opponents', opponents);
     
             var boardType = uxState.gameState && uxState.gameState.boardType;
             
@@ -363,18 +442,20 @@ var networkUX = (function () {
         };
 
         return function (player) {
+            // ATTACH LOCAL NUMBER
             uxState.lastOpponentNumber++;
             player.localNumber = uxState.lastOpponentNumber;
+            player.galleryBoardId = createOpponentBoard(player);
     
+            // INDEX PLAYER 3 Ways 
             uxState.players.byNumber[player.localNumber] = player;
             uxState.players.byId[player.id] = player;
+            uxState.players.byName[player.name] = player;
             
             methods.updateOpponentDataToUX(player);
-            
-            var galleryId = createOpponentBoard(player);
     
-            if (uxState.gameState && uxState.gameState.players && uxState.gameState.players[player.id]) {
-                populateBoard(galleryId, uxState.gameState.players[player.id])
+            if (uxState.gameState && uxState.gameState.playerState && uxState.gameState.playerState[player.id]) {
+                populateBoard(player.galleryBoardId, player.id)
             } else {
                 console.group('PLAYER NOT FOUND');
                 console.error('PLAYER ADD ERROR');
@@ -460,62 +541,122 @@ var networkInit = function () {
     };
 
     firebase.initializeApp(firebaseConfig);
-    
     var FB = firebase.database();
-
-    var gameDB = null;
-    var gamePlayers = null;
-    var joinQ = null;
-    var localPlayerDB = null;
     
-    var playerTracker = {};
+    methods.DB = {
+        gameDB: null,
+        participantsDB: null,
+        joinersDB: null,
+        playersDB: {}
+    };
+    
+    var reconcileSelfWithDataUpdate = function (player) {
+        console.log('RECONCILE SELF -- GOT DATA FROM API!', player);
+    };
 
-    var trackPlayer = function (playerSnapshot) {
-        var playerUpdate = playerSnapshot.val();
-        console.log('track Player!', playerUpdate);
-        // update uxState.gameState
-        // if UPDATE is about myself... special case
-        //     else: if uxState.gameState doesn't have this player yet
-        //          methods.addPlayer(player) 
-        //      else populate opponent gameboard
-    }
+    methods.network.sendPlayerUpdate = function (playerId) {
+        if (methods.DB.playersDB[playerId]) {
+            var data = methods.composeUXToData(uxState.gameState.playerState[playerId]);
+            console.log('data to send for ' + playerId, data);
+            if (data) {
+                methods.DB.playersDB[playerId].update({data: data});
+            }
+        }
+    };
+    
+    methods.network.exitGame = function () {
+        console.error('methods.network.exitGame() called -- SOMETHING SHOULD HAPPEN!');
+    };
+    
+    methods.network.cancelPendingJoin = function () {
+        console.error('methods.network.cancelPendingJoin() called -- SOMETHING SHOULD HAPPEN!');
+    };
+
+    var onPlayerData = function(sourcePlayerId) {  // handle result of DB. snapshot results
+        return function (playerSnapshot) {
+            var player = playerSnapshot.val();
+            console.log('track Player!', sourcePlayerId,  player);
+    
+            if (!player) {
+                console.error('NO PLAYER IN TRACK!', this);
+                return;
+            }
+    
+            if (player.id === uxState.localPlayerId) {
+                return reconcileSelfWithDataUpdate(player);
+            }
+            
+            if (!uxState.players.byId[player.id]) {
+                // NEW PLAYER ADDED TO SYSTEM!
+                methods.addPlayer(player);
+            } else {
+                methods.updateOpponentDataToUX(player);
+    
+                // RE - ATTACH LOCAL RESOURCES
+                player.localNumber = uxState.players.byId[player.id].localNumber;
+                player.galleryBoardId = uxState.players.byId[player.id].galleryBoardId;
+                player.featuredBoardId = uxState.players.byId[player.id].featuredBoardId;
+                player.mainBoardId = uxState.players.byId[player.id].mainBoardId;
+                
+                if (!player.localNumber) {
+                    console.error ('no local number!', player);
+                    console.log('uxState.players', uxState.players);
+                    
+                    return;
+                }
+                
+                if (!player.galleryBoardId) {
+                    console.error ('no galleryBoardId!', player);
+                    console.log('uxState.players', uxState.players);
+                }
+    
+                // RE-INDEX PLAYER 
+                uxState.players.byNumber[player.localNumber] = player;
+                uxState.players.byId[player.id] = player;
+                uxState.players.byName[player.name] = player;
+    
+                methods.updateAllBoards(player);
+            }
+        }; 
+    };
 
     var addPlayerTracker = function (playerId) {
-        if (!playerTracker[playerId]) {
-            playerTracker[playerId] = FB.ref('players/' + playerId).on('value', trackPlayer);
+        if (!methods.DB.playersDB[playerId]) {
+            console.log('addPlayerTracker players/' + playerId);
+            methods.DB.playersDB[playerId] = FB.ref('players/' + playerId);
+            methods.DB.playersDB[playerId].on('value', onPlayerData(playerId));
         }
     };
     
     var removePlayerTracker = function (playerId) {
-        if (playerTracker[playerId]) {
-            playerTracker[playerId].off('value');
-            delete playerTracker[playerId];
+        if (methods.DB.playersDB[playerId]) {
+            methods.DB.playersDB[playerId].off('value');
+            delete methods.DB.playersDB[playerId];
         }
     };
     
     methods.network.approveJoiner = function (playerName) {
-        joinQ.once('value', function (joinerSnapshot) {
+        methods.DB.joinersDB.once('value', function (joinerSnapshot) {
             var joiners = joinerSnapshot.val();
 
+            console.log('approveJoiners', joiners);
             var playerId = joiners[playerName];
+            
+            console.log('approveJoiners playerId', playerId);
+
             if (playerId) {
-                methods.addPlayer(playerId);
+                // methods.addPlayer(playerId);
 
                 console.log('OG joiners', JSON.parse(JSON.stringify(joiners)));
                 delete joiners[playerName];
                 console.log('NEW joiners', JSON.parse(JSON.stringify(joiners)));
                 
-                joinQ.set(joiners);
+                methods.DB.joinersDB.set(joiners);
 
-                gamePlayers.once('value', function (playerSnapshot) {
-                    var currentPlayers = playerSnapshot.val();
-                    if (currentPlayers[playerName]) {
-                        // already added, do nothing
-                    } else {
-                        currentPlayers[playerName] = playerId;
-                        gamePlayers.update(currentPlayers);
-                    }
-                })
+                var participantsUpdate = {};
+                participantsUpdate[playerName] = playerId;
+                methods.DB.participantsDB.update(participantsUpdate);
+                
             }
         });
     };
@@ -530,58 +671,67 @@ var networkInit = function () {
     }
     
     methods.network.initializeSelf = function () {
-        var selfUpdate = {};
+        var allPlayersUpdate = {};
         var selfId = uxState.localPlayerId;
         var selfName = uxState.localPlayerName;
 
-        selfUpdate[uxState.localPlayerId] = {
+        addPlayerTracker(selfId)
+        
+        var update = {
             id: selfId,
             name: selfName,
             data: ''
         };
-        FB.ref('players').update(selfUpdate);
 
-        FB.ref('players/' + selfId).once('value', function (selfSnapshot) {
-            var selfData = selfSnapshot.val();
-            if (selfData) {
-                addPlayerTracker(selfId)
-            } else {
-                setTimeout(methods.network.initiateSelfPlayer, 500);
-            }
-        });
+        allPlayersUpdate[uxState.localPlayerId] = update;
+
+        if (DEBUG) { console.log('SELF -- initializeSelf', selfId, update); }
+        FB.ref('players').update(allPlayersUpdate);
+
+        // ADD TO LOCAL
+        update.mainBoardId = 'self-main-board';
+        uxState.players.byId[selfId] = update;
+        uxState.players.byNumber[0] = update;
+        uxState.players.byName[selfName] = update;
     };
     
     methods.network.trackJoiners = function () {
-        joinQ.off('value');
-        joinQ.on('value', function(childSnapshot) {
-            console.group('joinQ update');
-            console.log('joinQ snapshot', childSnapshot.val());
+        methods.DB.joinersDB.off('value');
+        methods.DB.joinersDB.on('value', function(childSnapshot) {
+            console.group('joinersDB update');
+            console.log('joinersDB snapshot', childSnapshot.val());
             console.log('TODO -- HOOOK UP THE TOASTER FOR APPROVAL OF JOINERS');
             // TODO -- HOOOK UP THE TOASTER FOR APPROVAL OF JOINERS
             console.groupEnd();
         });
     };
     
-    var checkPlayers = function (currentPlayers) {
+    var reconcileParticipants = function (currentParticipants) {
         var playerName, trackedPlayerId;
         var currentPlayerIds = {};
         
         // ADD UNTRACKED PLAYERS
         // eslint-disable-next-line no-restricted-syntax
-        for (playerName in currentPlayers) {
-            if (currentPlayers.hasOwnProperty(playerName)) {
+        for (playerName in currentParticipants) {
+            if (currentParticipants.hasOwnProperty(playerName)) {
+                currentPlayerIds[currentParticipants[playerName]] = true;
                 if (playerName !== uxState.localPlayerName) { 
-                    // we will set up the "self" player when it has been initialized
-                    currentPlayerIds[currentPlayers[playerName]] = true;
-                    addPlayerTracker(currentPlayers[playerName]);
+                    // we set up the "self" player with a special case
+                    addPlayerTracker(currentParticipants[playerName]);
                 }
             }
         }
 
+        if (DEBUG) { 
+            console.log('reconcile currentParticipants', currentParticipants);
+            console.log('reconscile currentPlayerIds', currentPlayerIds);
+            console.log('reconcile methods.DB.playersDB', methods.DB.playersDB);
+        }
+        
         // REMOVE PLAYERS WHO HAVE LEFT THE GAME
         // eslint-disable-next-line no-restricted-syntax
-        for (trackedPlayerId in playerTracker) {
-            if (playerTracker.hasOwnProperty(trackedPlayerId)) {
+        for (trackedPlayerId in methods.DB.playersDB) {
+            if (methods.DB.playersDB.hasOwnProperty(trackedPlayerId)) {
                 if (!currentPlayerIds[trackedPlayerId]) {
                     removePlayerTracker(trackedPlayerId);
                     methods.removePlayer(trackedPlayerId);
@@ -591,18 +741,18 @@ var networkInit = function () {
     };
     
     methods.network.trackGameParticipants = function () {
-        gamePlayers.off('value');
-        gamePlayers.on('value', function (playersSnapshot) {
+        methods.DB.participantsDB.off('value');
+        methods.DB.participantsDB.on('value', function (playersSnapshot) {
             var currentPlayers = playersSnapshot.val();
-            checkPlayers(currentPlayers);
+            reconcileParticipants(currentPlayers);
         })
     };
 
-    methods.network.uponJoinApproval = function (currentPlayers) {
+    methods.network.uponJoinApproval = function (currentParticipants) {
         var gameId = uxState.pendingGame;
         uxState.gameState.gameId = gameId;
-        uxState.gameState.players = {};
-        checkPlayers(currentPlayers);
+        uxState.gameState.playerState = {};
+        reconcileParticipants(currentParticipants);
         methods.network.trackGameParticipants();
         methods.network.initializeSelf();
         methods.network.trackJoiners();
@@ -624,30 +774,22 @@ var networkInit = function () {
 
         reconcileBoardType(initialGameData);
 
-        gameDB = FB.ref('games/' +  initialGameData.id);
+        methods.DB.gameDB = FB.ref('games/' +  initialGameData.id);
+        methods.DB.participantsDB = FB.ref('games/' + initialGameData.id +'/participants');
+        methods.DB.joinersDB = FB.ref('games/' + initialGameData.id + '/joiners');
         
-        gamePlayers = FB.ref('games/' + initialGameData.id +'/players');
-        joinQ = FB.ref('games/' + initialGameData.id + '/joiners');
-        
-        gamePlayers.on('value', function(playersSnapshot) {
-            var players = playersSnapshot.val();
-            if (players[uxState.localPlayerName]) {
+        methods.DB.participantsDB.on('value', function(snapshot) {
+            var participants = snapshot.val();
+            if (participants[uxState.localPlayerName]) {
                 // player has been added to the game
-                methods.network.uponJoinApproval(players);
+                methods.network.uponJoinApproval(participants);
                 methods.uponJoinApprovalUX();
-                // turn off this listener;
-                gamePlayers.off('value');
             }
          });
         
-        joinQ.once('value', function (childSnapshot) {
-            var joiners = childSnapshot.val();
-            if (!joiners[uxState.localPlayerName]) {
-                joiners[uxState.localPlayerName] = uxState.localPlayerId;
-                joinQ.update(joiners);
-            }
-        })
-        
+        var joinUpdate = {};
+        joinUpdate[uxState.localPlayerName] = uxState.localPlayerId;
+        methods.DB.joinersDB.update(joinUpdate);
     };
     
     methods.network.createNewGame = function () {
@@ -663,18 +805,19 @@ var networkInit = function () {
         var playerUpdate = {
             id: uxState.localPlayerId,
             name: uxState.localPlayerName,
-            data: methods.composeUXToData(uxState.gameState.players[uxState.localPlayerId])
+            data: methods.composeUXToData(uxState.gameState.playerState[uxState.localPlayerId])
         };
         
-        localPlayerDB = FB.ref('players/' + uxState.localPlayerId);
-        localPlayerDB.set(playerUpdate);
-        localPlayerDB.on(function(snapshot){
-            console.log('localPlayer update!', snapshot.val());
+        methods.DB.playersDB[uxState.localPlayerId] = FB.ref('players/' + uxState.localPlayerId);
+        methods.DB.playersDB[uxState.localPlayerId].set(playerUpdate);
+        methods.DB.playersDB[uxState.localPlayerId].on(function(snapshot){
+            console.log('localPlayer update!', snapshot);
+            console.log('localPlayer update data!', snapshot.val());
         });
         
-        gameDB = FB.ref('games/' + uxState.newGameId)
-        gameDB.set(gameUpdate);
-        gameDB.on(function(snapshot) {
+        method.DB.gameDB = FB.ref('games/' + uxState.newGameId)
+        method.DB.gameDB.set(gameUpdate);
+        method.DB.gameDB.on(function(snapshot) {
             console.log('game update!', snapshot.val());
         });
     };
@@ -686,101 +829,6 @@ var networkInit = function () {
         })
     };
 };
-
-var initializeNetwork = function () {
-
-    
-    /*
-    var testStatusUpdater = function () {
-        var statusButton = document.getElementById('overview-button');
-        var gameContainer = document.getElementById('game-container-A');
-        var gameContainerControls = document.getElementById('game-container-controls-A');
-        var pageContainer = document.getElementById('page-container-A');
-
-        if (statusButton.classList.contains('join')) {
-            statusButton.classList.remove('join');
-            statusButton.classList.add('active');
-
-            statusButton.innerHTML = 
-                '<span class="data">Awsum Sawce</span>' +
-                '<div class="change-settings-button"></div>';
-
-            // ==== NETWORK GAME PANEL ===============
-            gameContainerControls.innerHTML = 
-                '<div class="player-id">' +
-                    '<span class="label">Player:</span>' + 
-                    '<span class="data">Rufus Woo</span>' +
-                '</div>' +
-                '<div class="game-id">' +
-                    '<span class="label">game:</span>' +
-                    '<span class="data">Awsum Sawce</span>' +
-                '</div>';
-
-            document.body.classList.add('network-game-active');
-            pageContainer.classList.add('top-shift-closed');
-            pageContainer.classList.remove('top-shift-open');
-
-        } else {
-            statusButton.classList.add('join');
-            statusButton.classList.remove('active');
-            statusButton.innerHTML = 'JOIN';
-
-            // ==== NETWORK GAME PANEL ===============
-            document.body.classList.remove('network-game-active');
-            pageContainer.classList.remove('top-shift-closed');
-            pageContainer.classList.remove('top-shift-open');
-            gameContainer.classList.remove('active');
-        }
-    };
-    
-  
-    
-    var testGameId = 'exampleA';
-
-    var setGameId = function(name) {
-        testGameId = name;
-    };
-    
-    var localGameData = {};
-    var gameDataMonitor = null;  
-    
-    var startMonitorOLD = function () {
-        gameDataMonitor = database.ref('games/' + testGameId);
-        
-        gameDataMonitor.on('value', function(snapshot) {
-            console.group('update');
-            console.log('got gameData!', snapshot);
-
-            var latest = snapshot.val();
-            if (latest) { localGameData = latest; } 
-            
-            console.log('latest', latest);
-            console.groupEnd();
-        });
-    };
-    
-    var setGameDataOLD = function (data, id) {
-        var nextId = id || testGameId;
-
-        console.log('sending to:', nextId, '  global gameId', testGameId);
-
-        database.ref('games/' + nextId).set(
-            data,
-            function(error) {
-                if (error) {
-                    console.log('save error');
-                } else {
-                    console.log('save success! ' + nextId);
-                }
-            }
-        );
-    };
-  
-    var testD = document.getElementById('test-button-D');
-    testD.addEventListener('click', network.testAddPlayer);
-  */
-  
-}; // END initializeNetwork;
 
 var initNetworkDOM = function () {
     var collapseButton = document.getElementById('collapse-button-A');
@@ -804,8 +852,6 @@ var loadFile = function (fileName, callback) {
 
 var loadScripts = (function () {
 
-    console.log('loadscripts called');
-
     var loadFirebase = function () {
         
         var firebaseLoaded = function () {
@@ -815,7 +861,7 @@ var loadScripts = (function () {
     
             setTimeout( function () {
                 // networkUX.runTests();
-                methods.network.testAcceptJoin();
+                // methods.network.testAcceptJoin();
             }, 500)
         };
         

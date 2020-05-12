@@ -1,11 +1,36 @@
+// ------- SHIM FOR el.closest() ----------
+if (!Element.prototype.matches) {
+  Element.prototype.matches = Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector;
+}
+
+// ------- SHIM FOR el.closest() ----------
+if (!Element.prototype.closest) {
+  Element.prototype.closest = function(s) {
+    var el = this;
+
+    do {
+      if (Element.prototype.matches.call(el, s)) return el;
+      el = el.parentElement || el.parentNode;
+    } while (el !== null && el.nodeType === 1);
+    return null;
+  };
+}
+
 (function () {
 'use strict';
+var ISpin = window.ISpin;
+var console = window.console;
+var DEBUG = window.DEBUG;
+var LOCAL_PLAYER_DEFAULT_ID = 'LOCAL_PLAYER_DEFAULT_ID';
 
 var methods = window.methods = window.methods || {};
-var uxStatus = window.uxStatus = window.uxStatus || {}; 
-var constants = window.constants = window.constants || {}; 
-var ISpin = window.ISpin;
+var uxState = window.uxState = window.uxState || {}; 
 
+var createHTML = function (htmlString) {
+  var div = document.createElement('div');
+  div.innerHTML = htmlString.trim();
+  return div.firstChild; 
+};
 
 methods.setupBoardA = (function() {
 
@@ -28,11 +53,11 @@ methods.setupBoardA = (function() {
 
     var allTerrains = [ 'forest', 'field', 'river', 'town', 'mountain', 'monster', 'ruins', 'crevasse'];
 
-    return function(boardElement, player) {
+    return function(boardElement, boardId) {
     
         if (!boardElement) {
-            uxStatus.currentPlayBoard = 'A';
-            uxStatus.gameBoardStarted = false;
+            uxState.currentPlayBoard = 'A';
+            uxState.gameBoardStarted = false;
             clearScoreCards();
             dismissModal();
         }
@@ -45,20 +70,20 @@ methods.setupBoardA = (function() {
         });            
         
         for (i = 0; i < mountainCells.length; i++) {
-            id = mountainCells[i] + (player ? '_' + player : '');
+            id = mountainCells[i] + (boardId ? '_' + boardId : '');
             el = document.getElementById(id);
             el.classList.add('mountain');
         }
         
         for (i = 0; i < ruinsCells.length; i++) {
-            id = ruinsCells[i] + (player ? '_' + player : '');
+            id = ruinsCells[i] + (boardId ? '_' + boardId : '');
             el = document.getElementById(id);
             el.classList.add('ruins');
         }
         
-        console.group('setup A');
+        console.groupCollapsed('setup A');
         console.log('boardElement', boardElement);
-        console.log('player', player);
+        console.log('boardId', boardId);
         console.groupEnd();
 
     };    
@@ -97,8 +122,8 @@ methods.setupBoardB = (function() {
     return function(boardElement, player, firstPass) {
         
         if (!boardElement) {
-            uxStatus.currentPlayBoard = 'B';
-            uxStatus.gameBoardStarted = false;
+            uxState.currentPlayBoard = 'B';
+            uxState.gameBoardStarted = false;
             clearScoreCards();
             dismissModal();
         }
@@ -140,7 +165,7 @@ methods.setupBoardB = (function() {
 var initGoldCoinTracker = function () {
     document.querySelectorAll('.gold-coin').forEach(function(el) {
         el.addEventListener('click', function() {
-            uxStatus.gameBoardStarted = true;
+            uxState.gameBoardStarted = true;
             if (this.classList.contains('active')) { 
                 this.classList.remove('active');
             } else {
@@ -150,32 +175,43 @@ var initGoldCoinTracker = function () {
     });
 };
 
+methods.gameSquareListener = (function () {
+    var playTerrains = [ 'forest', 'town', 'river', 'field', 'monster' ];
 
-var initGameBoard = function () {
-    document.querySelectorAll('.game-square').forEach(function(el){
-        el.addEventListener('click', function() {
+    return function (event) {
+        const target = event.target;
+        if (!target.classList.contains('mountain') && !target.classList.contains('crevasse')) { 
             
-            if (!this.classList.contains('mountain') && !this.classList.contains('crevasse')) { 
+            uxState.gameBoardStarted = true;
+
+            for (var i = 0; i < playTerrains.length; i++) {
+                var terrain = playTerrains[i];
                 
-                uxStatus.gameBoardStarted = true;
-
-                for (var i = 0; i < constants.playTerrains.length; i++) {
-                    var terrain = constants.playTerrains[i];
-                    
-                    if (terrain === uxStatus.currentTerrain) {
-                        if (this.classList.contains(terrain)) {
-                            this.classList.remove(terrain);
-                        } else {
-                            this.classList.add(terrain);
-                        }
+                if (terrain === uxState.currentTerrain) {
+                    if (target.classList.contains(terrain)) {
+                        target.classList.remove(terrain);
                     } else {
-                        this.classList.remove(terrain);
+                        target.classList.add(terrain);
                     }
+                } else {
+                    target.classList.remove(terrain);
                 }
-
             }
+            
+            var gameBoard = target.closest('.board-wrap');
+            methods.collectDataFromDOM(gameBoard);
+        }
+        
+    };
+})();
+
+var initGameBoard = function (boardId) {
+    document
+        .getElementById(boardId)
+        .querySelectorAll('.game-square')
+        .forEach(function (el) {
+            el.addEventListener('click', methods.gameSquareListener);
         });
-    });
 };
 
 
@@ -295,7 +331,7 @@ var initScoreCards = function() {
             final.innerHTML = score;
         },
         calc: function (season) {
-            uxStatus.gameBoardStarted = true;
+            uxState.gameBoardStarted = true;
             var score = 0;
              document.querySelectorAll('#score-card-' + season + ' .score-input').forEach(function(input) {
                  score += input.value ? Number(input.value) : 0;
@@ -344,11 +380,23 @@ var initScoreCards = function() {
 };
 
 var initTerrainSwitcher = function () {
+    
+    var tiles = ['forest', 'field', 'river', 'town', 'monster'];
+    
+    document.querySelectorAll('.terrain-wrap').forEach(function (wrap) {
+        tiles.forEach(function (tile) {
+            wrap.appendChild(createHTML(
+                '<div class="terrain-type terrain-' + tile + (tile === 'forest' ? ' active' : '') + '" ' + 
+                'data-terrain="' + tile + '"><div class="terrain-inner"></div></div>'
+            ))
+        });
+    });
+    
     document.querySelectorAll('.terrain-type').forEach(function(el){
         el.addEventListener('click', function() {
             document.querySelectorAll('.terrain-type').forEach(function(item){ item.classList.remove('active'); });
             this.classList.add('active');
-            uxStatus.currentTerrain = this.getAttribute('data-terrain');
+            uxState.currentTerrain = this.getAttribute('data-terrain');
         });
     });
 };
@@ -356,14 +404,14 @@ var initTerrainSwitcher = function () {
 methods.toggleAboutPanel = function (forceClose) {
     var aboutPanel = document.getElementById('about-panel');
 
-    if (uxStatus.showAboutPanel || forceClose === 'forceClose') {
-        uxStatus.showAboutPanel = false;
+    if (uxState.showAboutPanel || forceClose === 'forceClose') {
+        uxState.showAboutPanel = false;
         document.querySelectorAll('.about-link').forEach(function(el){
             el.classList.remove('active');
         });
         aboutPanel.classList.remove('active');
     } else {
-        uxStatus.showAboutPanel = true;
+        uxState.showAboutPanel = true;
         document.querySelectorAll('.about-link').forEach(function(el){
             el.classList.add('active');
         });
@@ -372,11 +420,20 @@ methods.toggleAboutPanel = function (forceClose) {
     
 };
 
-var initAboutButton = function () {
+var initPageTitle = function () {
+    var titleWrap = document.querySelector('.title-wrap');
+    var letters = 'CARTOGRAPHERS'.split('');
+    letters.forEach(function(letter) {
+        titleWrap.appendChild(createHTML('<div class="letter">' + letter + '</div>'));
+    })
+    
+    titleWrap.appendChild(createHTML(
+        '<div class="about-link"><span class="question">?</span><span class="x-close">X</span></div>'
+    ));
+
     document.querySelectorAll('.about-link').forEach(function(el){
         el.addEventListener('click', methods.toggleAboutPanel);
     });
-    
 };
 
 var buildScoreCard = (function() {
@@ -536,7 +593,7 @@ var addCoins = function() {
 };
 
 var initOverviewMenu = function () {
-    var menuCloser = function (evt) {
+    methods.menuCloser = function (evt) {
         var el = document.getElementById('network-overview');
         var targetElement = evt.target; // clicked element
         
@@ -548,11 +605,12 @@ var initOverviewMenu = function () {
             // Go up the DOM
             targetElement = targetElement.parentNode;
         }
-        document.removeEventListener('click', menuCloser);
+        document.removeEventListener('click', methods.menuCloser);
         methods.closeNetworkOverview();
     };
     
     methods.closeNetworkOverview = function () {
+        document.removeEventListener('click', methods.menuCloser);
         var panel = document.getElementById('network-overview');
         panel.classList.remove('opaque');
         panel.classList.remove('follow');
@@ -570,7 +628,7 @@ var initOverviewMenu = function () {
         setTimeout(function () {
             var pPanel = document.getElementById('network-overview');
             pPanel.classList.add('opaque');
-            document.addEventListener('click', menuCloser);
+            document.addEventListener('click', methods.menuCloser);
         }, 10);
     };
     
@@ -623,8 +681,46 @@ var initOverviewMenu = function () {
         pendingCancel.classList.add('show');
     };
     
+    methods.showActiveGameUX = function () {
+        var gameId = uxState.gameState.gameId;
+
+        // ---- ACION BUTTON ------------------
+        var statusButton = document.getElementById('overview-button');
+        statusButton.classList.remove('join');
+        statusButton.classList.remove('pending');
+        statusButton.classList.add('active');
+
+        statusButton.innerHTML = 
+            '<span class="data">' + gameId + '</span>' +
+            '<div class="change-settings-button"></div>';
+        
+        methods.showExitGameUX();
+    };
+    
+    methods.showExitGameUX = function () {
+        methods.closeNetworkOverview();
+
+        var statusButton = document.getElementById('overview-button');
+        statusButton.classList.add('join');
+        statusButton.classList.remove('active');
+        statusButton.classList.remove('pending');
+        statusButton.innerHTML = 'JOIN';
+
+        var joinGameInputs = document.getElementById('join-game-inputs-A');
+        joinGameInputs.classList.remove('disabled');
+        joinGameInputs.classList.add('hidden');
+        
+        var exitGame = document.getElementById('game-exit-wrap');
+        var exitId = exitGame.querySelector('.game-id');
+        exitId.innerHTML = uxState.gameState.gameId;
+        exitGame.classList.add('show');
+    };
+    
+    methods.exitGameUX = function () {
+        console.log('EXIT GAME!');
+    };
+
     methods.requestGameJoin = function (gameData) {
-        console.log('methods.requestGameJoin', gameData);
         var playerNameInput = document.getElementById('player-name-input');
 
         uxState.localPlayerName = playerNameInput.value;
@@ -709,7 +805,25 @@ var initOverviewMenu = function () {
         playerNameInput.addEventListener('keyup', monitorInputs);
     }
     
+    methods.cancelPendingJoin = function () {
+        methods.cancelPendingJoinUX();
+        methods.network.cancelPendingJoin();
+    };
     
+    methods.exitGame = function () {
+        methods.exitGameUX();
+        methods.network.exitGame();
+    };
+
+    var initPanelButtons = function () {
+        var cancelButton = document.getElementById('cancel-join');
+        var exitButton =  document.getElementById('game-exit');
+        
+        cancelButton.addEventListener('click', methods.cancelPendingJoin);
+        exitButton.addEventListener('click', methods.exitGame);
+    };
+    
+    initPanelButtons();
     initOverviewButton();
     initOverviewInputs();
 }
@@ -720,10 +834,10 @@ var initFeaturedModal = function () {
 };
 
 methods.localInit = function() {
-    initAboutButton();
+    initPageTitle();
     initOverviewMenu();
     initTerrainSwitcher();
-    initGameBoard();
+    initGameBoard('self-main-board');
     initGoldCoinTracker();
     initScoreCards();
     initBoardSwitcher();
@@ -731,7 +845,9 @@ methods.localInit = function() {
 };
 
 methods.buildMainDom = function() {
-    document.getElementById('board-location').appendChild(methods.buildGameBoard());
+    var mainBoard = methods.buildGameBoard();
+    mainBoard.setAttribute('id', 'self-main-board');
+    document.getElementById('board-location').appendChild(mainBoard);
     buildScoreSection(document.getElementById('score-cards-section'));
     addCoins();
 };
