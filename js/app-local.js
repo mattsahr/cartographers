@@ -16,27 +16,218 @@ if (!Element.prototype.closest) {
   };
 }
 
-(function () {
-'use strict';
-var ISpin = window.ISpin;
-var console = window.console;
-var DEBUG = window.DEBUG;
-var LOCAL_PLAYER_DEFAULT_ID = 'LOCAL_PLAYER_DEFAULT_ID';
-
-var methods = window.methods = window.methods || {};
-var uxState = window.uxState = window.uxState || {}; 
-
-
-
-
-
 var createHTML = function (htmlString) {
   var div = document.createElement('div');
   div.innerHTML = htmlString.trim();
   return div.firstChild; 
 };
 
-methods.setupBoardA = (function() {
+(function () {
+
+'use strict';
+var ISpin = window.ISpin;
+var $ = window.$; // nano.js
+var console = window.console;
+var DEBUG = window.DEBUG;
+var LOCAL_PLAYER_DEFAULT_ID = 'LOCAL_PLAYER_DEFAULT_ID';
+var EMPTY_DATA_STRING = '[[],[],[],[],[],0]';
+
+var methods = window.methods = window.methods || {};
+var uxState = window.uxState = window.uxState || {}; 
+var network = methods.network = methods.network || {}; 
+var UX = methods.UX =  methods.UX || {};
+
+
+UX.collectDataFromDOM = (function () {
+    function toArray(obj) {
+        var array = [];
+        // iterate backwards ensuring that length is an UInt32
+        for (var i = obj.length >>> 0; i--;) { 
+            array[i] = obj[i];
+        }
+        return array;
+    }
+    var playTerrains = [ 'forest', 'town', 'river', 'field', 'monster' ];
+
+    var letterToNumber = { a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7, h: 8, i: 9, j: 10, k: 11, l: 12 }
+    
+    var getCoordinates = function (idString) {
+        var coord = idString.split('_');
+        return [Number(coord[3]), letterToNumber[coord[1]]];
+    };
+
+    return function (gameBoardOrId, requestReturn) {
+
+        var gameBoard = typeof gameBoardOrId === 'string'
+            ? document.getElementById(gameBoardOrId)
+            : gameBoardOrId;
+
+        var gameData = {
+            field: [],
+            forest: [],
+            monster: [],
+            river: [],
+            town: [],
+        };
+
+        var playerId = gameBoard.getAttribute('data-player-id') || uxState.localPlayerId || LOCAL_PLAYER_DEFAULT_ID;
+        gameBoard.querySelectorAll('.game-square').forEach(function(el) {
+            playTerrains.forEach(function (terrain) {
+                if (toArray(el.classList).indexOf(terrain) !== -1) {
+                    gameData[terrain].push(getCoordinates(el.id));
+                }
+            });
+        });
+
+        if (requestReturn) {
+            return gameData;
+        }
+        
+        uxState.gameState.playerState[playerId] = gameData;
+        network.sendPlayerUpdate(playerId);
+        
+    };
+})();
+
+UX.composeDataToUX = function (sourceData) {
+    var playerState = {
+        field: [],
+        forest: [],
+        monster: [],                
+        river: [],
+        town: [],
+        score: 0
+    };
+    if (!sourceData) {
+        return playerState;
+    }
+    var data = Array.isArray(sourceData) ? sourceData : JSON.parse(sourceData);
+    
+    playerState.field = data[0] || [];
+    playerState.forest = data[1] || [];
+    playerState.monster = data[2] || [];
+    playerState.river = data[3] || [];
+    playerState.town = data[4] || [];
+    playerState.score = data[5] || 0;
+    
+    return playerState;
+};
+
+
+UX.updateAllBoards = function (player) {
+    if (player.galleryBoardId) {
+        UX.populateBoard(player.galleryBoardId, player.id);
+    }
+    if (player.featuredBoardId) {
+        UX.populateBoard(player.featuredBoardId, player.id);
+    }
+    if (player.mainBoardId) {
+        UX.populateBoard(player.mainBoardId, player.id);
+    }
+};    
+
+
+UX.populateBoard = (function (){
+    var terrains = ['field', 'forest', 'monster', 'river', 'town'];
+    var rowIndex = {
+        '1': 'a',
+        '2': 'b',
+        '3': 'c',
+        '4': 'd',
+        '5': 'e',
+        '6': 'f',
+        '7': 'g',
+        '8': 'h',
+        '9': 'i',
+        '10': 'j',
+        '11': 'k'
+    }
+    
+    var removeAllTerrains = function(square) {
+        terrains.forEach(function(terrain) {
+            square.classList.remove(terrain);
+        })
+    };
+    
+    return function (currentBoardId, playerId) {
+        var data = uxState.gameState.playerState[playerId];
+        var boardId = currentBoardId === 'self-main-board' ? '' : currentBoardId;
+
+        console.log(
+            'player', playerId, 
+            '  currentBoardIdardId', currentBoardId, 
+            '  data', data
+        );
+
+        var board = document.getElementById(currentBoardId);
+        if (board) {
+            board.querySelectorAll('.game-square').forEach(removeAllTerrains);
+        }
+
+        terrains.forEach(function(terrain) {
+            if (data[terrain]) {
+                console.log('data[' + terrain + ']', data[terrain]);
+                data[terrain].forEach(function (plot) {
+                    var id = 'row_' + rowIndex[plot[1]] + '_cell_' + plot[0] + 
+                        (boardId ? ('_' + boardId) : '');
+                    var square = document.getElementById(id);
+                    if (square) {
+                        removeAllTerrains(square);
+                        square.classList.add(terrain);
+                    } else {
+                        console.log('---- square not found --- ', id);
+                    }
+                });
+            }
+        });
+
+    };
+    
+})();
+
+UX.reconcileBoardType = function (gameDataProps) {
+    var gameData = gameDataProps || uxState.gameState;
+
+    var boardType = uxState.gameState.boardType = gameData.boardType || 'A';
+    if (uxState.currentPlayBoard !== boardType) {
+        uxState.currentPlayBoard = boardType;
+        if (boardType === 'A') {
+            UX.setupBoardA();
+        } else {
+            UX.setupBoardB();
+        }
+    }
+};
+
+
+UX.createNewGameUX = function (bType) {
+    uxState.currentPlayBoard = bType;
+
+    uxState.gameState = uxState.gameState = {
+        boardType: bType,
+        gameId: uxState.pendingGame,
+        playerState: {}
+    }
+    UX.showPendingJoinUX();
+};
+
+UX.uponJoinApprovalUX = function () {
+    var gameId = uxState.gameState.gameId;
+    console.log('-------- uponJoinApprovalUX()  ' + gameId + '  --------------');
+
+    if (gameId) {
+        UX.showActiveGameUX();
+        UX.setNetworkFooterUX();
+        UX.setNetworkUX('on');
+
+    } else {
+        UX.setNetworkUX('off');
+    }
+
+};
+
+
+UX.setupBoardA = (function() {
 
     var mountainCells = [
         'row_b_cell_4',
@@ -93,7 +284,7 @@ methods.setupBoardA = (function() {
     };    
 })();
 
-methods.setupBoardB = (function() {
+UX.setupBoardB = (function() {
     var mountainCells = [
         'row_b_cell_9',
         'row_c_cell_4',
@@ -179,7 +370,7 @@ var initGoldCoinTracker = function () {
     });
 };
 
-methods.gameSquareListener = (function () {
+UX.gameSquareListener = (function () {
     var playTerrains = [ 'forest', 'town', 'river', 'field', 'monster' ];
 
     return function (event) {
@@ -203,22 +394,20 @@ methods.gameSquareListener = (function () {
             }
             
             var gameBoard = target.closest('.board-wrap');
-            methods.collectDataFromDOM(gameBoard);
+            UX.collectDataFromDOM(gameBoard);
         }
         
     };
 })();
 
-
-var initGameBoard = function (boardId) {
+UX.initGameBoard = function (boardId) {
     document
         .getElementById(boardId)
         .querySelectorAll('.game-square')
         .forEach(function (el) {
-            el.addEventListener('click', methods.gameSquareListener);
+            el.addEventListener('click', UX.gameSquareListener);
         });
 };
-
 
 var dismissModal = function() {
     document.querySelectorAll('.modal-panel').forEach(function (panel) {
@@ -228,28 +417,26 @@ var dismissModal = function() {
 };
 
 var clearScoreCards = function() {
-     document.querySelectorAll('.score-input').forEach(function(input) {
-         input.value = '';
-     });
+    document.querySelectorAll('.score-input').forEach(function(input) {
+        input.value = '';
+    });
+
     document.querySelectorAll('.score-result').forEach(function(result) {
         result.innerHTML = '';
         result.setAttribute('data-score', '0');
     });
-    var final = document.getElementById('final-score');
-    final.innerHTML = '';
 
-    
     document.querySelectorAll('.gold-coin').forEach(function(coin) {
         coin.classList.remove('active');
     });
+
+    var final = document.getElementById('final-score');
+    final.innerHTML = '';
 };
 
-
 var initBoardSwitcher = function() {
-    
+
     var confirmA = function() {
-        
-        console.log('confirmA uxState.currentPlayBoard', uxState.currentPlayBoard);
         
         if (uxState.currentPlayBoard !== 'A') {
             if (uxState.gameBoardStarted) {
@@ -258,14 +445,14 @@ var initBoardSwitcher = function() {
                     panel.classList.add('warn-a');
                 });
             } else {
-                clickChooseA()
+                clickChooseA();
             }
+        } else {
+            clickChooseA();
         }
     };
     
     var confirmB = function() {
-
-        console.log('confirmA uxState.currentPlayBoard', uxState.currentPlayBoard);
 
         if (uxState.currentPlayBoard !== 'B') {
             if (uxState.gameBoardStarted) {
@@ -276,49 +463,41 @@ var initBoardSwitcher = function() {
             } else {
                 clickChooseB();
             }
+        } else {
+            clickChooseB();
         }
-    };
 
-    var chooseA = document.getElementById('selector-choice-a');
-    var chooseB = document.getElementById('selector-choice-b');
-    
-    chooseA.addEventListener('click', confirmA);
-    chooseB.addEventListener('click', confirmB);
+    };
     
     var clickChooseA = function() {
-            var buttonA = document.getElementById('selector-choice-a');
-            var buttonB = document.getElementById('selector-choice-b');
-        
-            buttonA.classList.add('active');
-            buttonB.classList.remove('active');
-            
-            uxState.currentPlayBoard = 'A';
-            methods.setupBoardA();
+        $('#selector-choice-a').addClass('active');
+        $('#selector-choice-b').removeClass('active');
+
+        UX.setupBoardA();
+        UX.createNewGameUX('A')
+        network.createNewGame();
     };
     
     var clickChooseB = function() {
-            var buttonA = document.getElementById('selector-choice-a');
-            var buttonB = document.getElementById('selector-choice-b');
-        
-            buttonA.classList.remove('active');
-            buttonB.classList.add('active');
-
-            uxState.currentPlayBoard = 'B';
-            methods.setupBoardB();
+        $('#selector-choice-a').removeClass('active');
+        $('#selector-choice-b').addClass('active');
+    
+        UX.setupBoardB();
+        UX.createNewGameUX('B')
+        network.createNewGame();
     };
 
+    var cancelNewGame = function () {
+        UX.exitGameUX('cancelGameCreate');
+    };
 
-    document.querySelectorAll('.confirm-inner.confirm-a .confirm-button.yes').forEach(function (yesA) {
-        yesA.addEventListener('click', clickChooseA);
-    });
-    
-    document.querySelectorAll('.confirm-inner.confirm-b .confirm-button.yes').forEach(function (yesB) {
-        yesB.addEventListener('click', clickChooseB);
-    });
-    
-    document.querySelectorAll('.confirm-inner .confirm-button.no').forEach(function (noButton) {
-        noButton.addEventListener('click', dismissModal);
-    });
+    $('#selector-choice-a').on('click', confirmA);
+    $('#selector-choice-b').on('click', confirmB);
+    $('#selector-choice-cancel').on('click', cancelNewGame);
+
+    $('.confirm-inner.confirm-a .confirm-button.yes').on('click', clickChooseA);
+    $('.confirm-inner.confirm-b .confirm-button.yes').on('click', clickChooseB);
+    $('.confirm-inner .confirm-button.no').on('click', dismissModal);
 
 };
 
@@ -406,7 +585,7 @@ var initTerrainSwitcher = function () {
     });
 };
 
-methods.toggleAboutPanel = function (forceClose) {
+UX.toggleAboutPanel = function (forceClose) {
     var aboutPanel = document.getElementById('about-panel');
 
     if (uxState.showAboutPanel || forceClose === 'forceClose') {
@@ -437,7 +616,7 @@ var initPageTitle = function () {
     ));
 
     document.querySelectorAll('.about-link').forEach(function(el){
-        el.addEventListener('click', methods.toggleAboutPanel);
+        el.addEventListener('click', UX.toggleAboutPanel);
     });
 };
 
@@ -510,7 +689,7 @@ var buildScoreSection = function (parentNode) {
     parentNode.appendChild(finalScore);
 };
 
-methods.buildGameBoard = (function() {
+UX.buildGameBoard = (function() {
     var buildCell = (function(){
 
         var inner = '<div class="inner"></div>';
@@ -585,6 +764,81 @@ methods.buildGameBoard = (function() {
     };
 })();
 
+UX.resetMainBoardUX = function() {
+    var gameData = UX.composeDataToUX(EMPTY_DATA_STRING);
+
+    console.log('GAME DATA', gameData);
+
+    var player = uxState.players.byId[uxState.localPlayerId] || 
+        {
+            id: uxState.localPlayerId,
+            name: uxState.localPlayerName,
+            mainBoardId: 'self-main-board'        
+        };
+
+    player.data = gameData;
+
+    uxState.players.byId[uxState.localPlayerId] = player;
+    uxState.players.byName[uxState.localPlayerName] = player;
+    uxState.players.byNumber[0] = player;
+
+    uxState.gameState.playerState[uxState.localPlayerId] = gameData;
+    UX.updateAllBoards(player);
+    clearScoreCards();
+}
+
+var initResetButton = (function() {
+
+    var panelCloser = function (evt) {
+        var el = document.getElementById('board-reset-confirm-panel');
+        var targetElement = evt.target; // clicked element
+        
+        while (targetElement) {
+            if (targetElement === el) {
+                // This is a click inside. Do nothing, just return.
+                return;
+            }
+            // Go up the DOM
+            targetElement = targetElement.parentNode;
+        }
+        document.removeEventListener('click', panelCloser);
+        closeReset();
+    };
+
+    var resetMainBoard = function () {
+        UX.resetMainBoardUX();
+        network.resetMainBoard();
+        closeReset();
+    };
+
+
+    var confirmReset = function () {
+        var resetConfirmPanel = document.getElementById('board-reset-confirm-panel');
+        console.log('CONFIRM RESET!', resetConfirmPanel);
+        resetConfirmPanel.classList.add('show');
+        setTimeout(function () { document.addEventListener('click', panelCloser); }, 50);
+
+    };
+
+    var closeReset = function () {
+        var resetConfirmPanel = document.getElementById('board-reset-confirm-panel');
+        resetConfirmPanel.classList.remove('show');
+    };
+
+    return function () {
+        document.getElementById('board-reset-button')
+            .addEventListener('click', confirmReset);
+
+        document.getElementById('board-reset-confirm-button')
+            .addEventListener('click', resetMainBoard);
+
+        document.getElementById('board-reset-cancel-button')
+            .addEventListener('click', closeReset);
+    };
+
+})();
+
+
 var addCoins = function() {
     var element = document.getElementById('gold-coins-wrapper');
 
@@ -595,10 +849,24 @@ var addCoins = function() {
         coin.innerHTML = '<div class="inner"></div>';
         element.appendChild(coin);
     }
+
+    var resetWrap = document.createElement('div');
+    resetWrap.classList.add('reset-board-wrap');
+    resetWrap.setAttribute('alt', 'Reset Board');
+    resetWrap.setAttribute('title', 'Reset Board');
+    resetWrap.innerHTML = 
+        '<div class="reset-confirm-panel" id="board-reset-confirm-panel">' +
+            '<div class="message">Clear your whole board?</div>' +
+            '<div class="button confirm" id="board-reset-confirm-button">Yes</div>' +
+            '<div class="button cancel" id="board-reset-cancel-button">No</div>' +
+        '</div>' +
+        '<div class="reset-board-button" id="board-reset-button"></div>'
+
+    element.appendChild(resetWrap);
 };
 
 var initOverviewMenu = function () {
-    methods.menuCloser = function (evt) {
+    UX.menuCloser = function (evt) {
         var el = document.getElementById('network-overview');
         var targetElement = evt.target; // clicked element
         
@@ -610,12 +878,12 @@ var initOverviewMenu = function () {
             // Go up the DOM
             targetElement = targetElement.parentNode;
         }
-        document.removeEventListener('click', methods.menuCloser);
-        methods.closeNetworkOverview();
+        document.removeEventListener('click', UX.menuCloser);
+        UX.closeNetworkOverview();
     };
     
-    methods.closeNetworkOverview = function () {
-        document.removeEventListener('click', methods.menuCloser);
+    UX.closeNetworkOverview = function () {
+        document.removeEventListener('click', UX.menuCloser);
         var panel = document.getElementById('network-overview');
         panel.classList.remove('opaque');
         panel.classList.remove('follow');
@@ -627,13 +895,13 @@ var initOverviewMenu = function () {
         }        
     };
     
-    methods.openNetworkOverview = function () {
+    UX.openNetworkOverview = function () {
         var panel = document.getElementById('network-overview');
         panel.classList.add('show');
         setTimeout(function () {
             var pPanel = document.getElementById('network-overview');
             pPanel.classList.add('opaque');
-            document.addEventListener('click', methods.menuCloser);
+            document.addEventListener('click', UX.menuCloser);
         }, 10);
     };
     
@@ -641,119 +909,168 @@ var initOverviewMenu = function () {
         document.getElementById('overview-button').addEventListener('click', function() {
             var panel = document.getElementById('network-overview');
             if (panel.classList.contains('opaque') || panel.classList.contains('show')) {
-                methods.closeNetworkOverview();
+                UX.closeNetworkOverview();
             } else {
-                methods.openNetworkOverview();
+                UX.openNetworkOverview();
             }
         });
     };
-    
-    methods.cancelPendingJoinUX = function () {
-        var statusButton = document.getElementById('overview-button');
-        statusButton.classList.add('join');
-        statusButton.classList.remove('active');
-        statusButton.classList.remove('pending');
-        statusButton.innerHTML = 'JOIN';
-        
-        var joinGameInputs = document.getElementById('join-game-inputs-A');
-        joinGameInputs.classList.remove('disabled');
-        joinGameInputs.classList.add('hidden');
 
-        var pendingCancel = document.getElementById('pending-cancel-wrap');
-        var pendingId = pendingCancel.querySelector('.game-id');
-        pendingId.innerHTML = '';
-        pendingCancel.classList.remove('show');
+    var updateStatusButton = function (type) {
+        var gameId = uxState.gameState.gameId || uxState.pendingGame;
+        var statusButton = document.getElementById('overview-button');
+        switch (type) {
+            case 'join': 
+                statusButton.classList.add('join');
+                statusButton.classList.remove('active');
+                statusButton.classList.remove('pending');
+                statusButton.innerHTML = 'JOIN';
+                break;
+            case 'pending':
+                statusButton.classList.remove('join');
+                statusButton.classList.remove('active');
+                statusButton.classList.add('pending');
+                statusButton.innerHTML = 
+                    '<span class="pending-message">Waiting to Join...</span>' +
+                    '<div class="pending-icon"></div>';
+                break;
+            case 'active':
+                statusButton.classList.remove('join');
+                statusButton.classList.remove('pending');
+                statusButton.classList.add('active');
+
+                statusButton.innerHTML = 
+                    '<span class="label">JOINED:</span>' +
+                    '<span class="data">' + gameId + '</span>' +
+                    '<div class="change-settings-button"></div>';
+                break;
+            default:
+                console.log('woo');
+        }
     }
 
-    methods.showPendingJoinUX = function () {
-        methods.closeNetworkOverview();
-
-        var statusButton = document.getElementById('overview-button');
-        statusButton.classList.remove('join');
-        statusButton.classList.remove('active');
-        statusButton.classList.add('pending');
-        statusButton.innerHTML = 
-            '<span class="pending-message">Waiting to Join...</span>' +
-            '<div class="pending-icon"></div>';
-
+    UX.hideAllOverviewContents = function () {
         var joinGameInputs = document.getElementById('join-game-inputs-A');
         joinGameInputs.classList.remove('disabled');
         joinGameInputs.classList.add('hidden');
-        
+
+        var createGameWrap = document.getElementById('create-new-game-A');
+        createGameWrap.classList.remove('show');
+
+        var pendingCancel = document.getElementById('pending-cancel-wrap');
+        pendingCancel.classList.remove('show');
+
+        var exitGame = document.getElementById('game-exit-wrap');
+        exitGame.classList.remove('show');
+    };
+    
+    UX.cancelPendingJoinUX = function () {
+        updateStatusButton('join');
+        UX.hideAllOverviewContents();
+
+        // SHOW JOIN GAME
+        var joinGameInputs = document.getElementById('join-game-inputs-A');
+        joinGameInputs.classList.remove('disabled');
+        joinGameInputs.classList.remove('hidden');
+    }
+
+    UX.showPendingJoinUX = function () {
+        UX.closeNetworkOverview();
+        updateStatusButton('pending');
+        UX.hideAllOverviewContents();
+
+        // SHOW PENDING JOIN UX
         var pendingCancel = document.getElementById('pending-cancel-wrap');
         var pendingId = pendingCancel.querySelector('.game-id');
         pendingId.innerHTML = uxState.pendingGame;
         pendingCancel.classList.add('show');
     };
     
-    methods.showActiveGameUX = function () {
-        var gameId = uxState.gameState.gameId;
-
-        // ---- ACION BUTTON ------------------
-        var statusButton = document.getElementById('overview-button');
-        statusButton.classList.remove('join');
-        statusButton.classList.remove('pending');
-        statusButton.classList.add('active');
-
-        statusButton.innerHTML = 
-            '<span class="data">' + gameId + '</span>' +
-            '<div class="change-settings-button"></div>';
-        
-        methods.showExitGameUX();
+    UX.showActiveGameUX = function () {
+        updateStatusButton('active');        
+        UX.showExitGameUX();
     };
     
-    methods.showExitGameUX = function () {
-        methods.closeNetworkOverview();
+    UX.showExitGameUX = function () {
+        UX.closeNetworkOverview();
+        UX.hideAllOverviewContents();
 
-        var statusButton = document.getElementById('overview-button');
-        statusButton.classList.add('join');
-        statusButton.classList.remove('active');
-        statusButton.classList.remove('pending');
-        statusButton.innerHTML = 'JOIN';
-
-        var joinGameInputs = document.getElementById('join-game-inputs-A');
-        joinGameInputs.classList.remove('disabled');
-        joinGameInputs.classList.add('hidden');
-        
+        // SHOW EXIT GAME UX
         var exitGame = document.getElementById('game-exit-wrap');
         var exitId = exitGame.querySelector('.game-id');
         exitId.innerHTML = uxState.gameState.gameId;
         exitGame.classList.add('show');
     };
     
-    methods.exitGameUX = function () {
+    UX.exitGameUX = function (cancelGameCreate) {
         console.log('EXIT GAME!');
+        uxState.priorGame = uxState.pendingGame || uxState.gameState.gameId;
+        UX.hideAllOverviewContents();
+        updateStatusButton('join');
+
+        // SHOW JOIN GAME
+        $('#game-id-input').value[0].value = '';
+        var joinGameInputs = document.getElementById('join-game-inputs-A');
+        joinGameInputs.classList.remove('disabled');
+        joinGameInputs.classList.remove('hidden');
+
+        if (!cancelGameCreate) {
+            UX.exitGameOpponentsUX();
+            UX.exitGameNotifyUX();
+        }
     };
 
-    methods.requestGameJoin = function (gameData) {
+    UX.saveLocalPlayer = function () {
         var playerNameInput = document.getElementById('player-name-input');
-
         uxState.localPlayerName = playerNameInput.value;
         uxState.localPlayerId = uxState.localPlayerName + uxState.localPlayerHashId;
-        uxState.pendingGame = gameData.id;
 
-        methods.showPendingJoinUX();
-        methods.network.requestGameJoin(gameData);
+        var playerObject = {
+            name: uxState.localPlayerName,
+            id: uxState.localPlayerId,
+            mainBoardId: 'self-main-board',
+        };
+
+        uxState.players.byId[playerObject.id] = playerObject;
+        uxState.players.byName[playerObject.name] = playerObject;
+        uxState.players.byNumber[0] = playerObject;
+    };
+
+    UX.requestGameJoin = function (gameData) {
+        uxState.pendingGame = gameData.id;
+        UX.saveLocalPlayer();
+
+        UX.showPendingJoinUX();
+        network.requestGameJoin(gameData);
     };
     
-    methods.showCreateGameUX = function (gameId) {
+    UX.showCreateGameUX = function (gameId) {
         console.log('showCreateGameUX', gameId);
+        UX.hideAllOverviewContents();
+
+        // SHOW CREATE GAME UX
+        var createGameWrap = document.getElementById('create-new-game-A');
+        createGameWrap.classList.add('show');
+        document.getElementById('message-new-game-id').innerHTML = gameId;
     };
     
-    var checkGameId = function (e) {
+    var savePlayerCheckGameId = function (e) {
         if (e.target.getAttribute('disabled')) {
             return false;
         }
+        UX.saveLocalPlayer();
+
+        document.getElementById('join-game-inputs-A').classList.add('disabled')
+
         var gameIdInput = document.getElementById('game-id-input');
         var gameId = gameIdInput.value;
 
-        document.getElementById('join-game-inputs-A').classList.add('disabled')
-        
-        methods.network.checkGameId( gameId).then(function(results) {
+        network.checkGameId(gameId).then(function(results) {
             if (results) {
-                methods.requestGameJoin(results)
+                UX.requestGameJoin(results)
             } else {
-                methods.showCreateGameUX(gameId);
+                uxState.pendingGame = gameId;
+                UX.showCreateGameUX(gameId);
             }
         });
 
@@ -793,7 +1110,7 @@ var initOverviewMenu = function () {
         if (goodName && goodGame) {
             joinButton.removeAttribute('disabled');
             if (e.key === 'Enter' && e.target.id === 'game-id-input') {
-                checkGameId(e);
+                savePlayerCheckGameId(e);
             }
         } else {
             joinButton.setAttribute('disabled', 'true');
@@ -805,27 +1122,27 @@ var initOverviewMenu = function () {
         var playerNameInput = document.getElementById('player-name-input');
         var gameIdInput = document.getElementById('game-id-input');
         
-        joinButton.addEventListener('click', checkGameId);
+        joinButton.addEventListener('click', savePlayerCheckGameId);
         gameIdInput.addEventListener('keyup', monitorInputs);
         playerNameInput.addEventListener('keyup', monitorInputs);
     }
     
-    methods.cancelPendingJoin = function () {
-        methods.cancelPendingJoinUX();
-        methods.network.cancelPendingJoin();
+    UX.cancelPendingJoin = function () {
+        UX.cancelPendingJoinUX();
+        network.cancelPendingJoin();
     };
     
-    methods.exitGame = function () {
-        methods.exitGameUX();
-        methods.network.exitGame();
+    UX.exitGame = function () {
+        UX.exitGameUX();
+        network.exitGame();
     };
 
     var initPanelButtons = function () {
         var cancelButton = document.getElementById('cancel-join');
         var exitButton =  document.getElementById('game-exit');
         
-        cancelButton.addEventListener('click', methods.cancelPendingJoin);
-        exitButton.addEventListener('click', methods.exitGame);
+        cancelButton.addEventListener('click', UX.cancelPendingJoin);
+        exitButton.addEventListener('click', UX.exitGame);
     };
     
     initPanelButtons();
@@ -833,24 +1150,38 @@ var initOverviewMenu = function () {
     initOverviewInputs();
 }
 
-var initFeaturedModal = function () {
-    document.querySelector('.featured-board-modal .modal-background')
-        .addEventListener('click', methods.collapseFeaturedModal)
+UX.initializeSelf = function (id, update) {
+    update.mainBoardId = 'self-main-board';
+    uxState.players.byId[id] = update;
+    uxState.players.byNumber[0] = update;
+    if (update.name) {
+        uxState.players.byName[update.name] = update;
+    }
+
+    if (update.data) {
+        uxState.gameState.playerState[id] = update.data;
+    }
 };
 
-methods.localInit = function() {
+var initFeaturedModal = function () {
+    document.querySelector('.featured-board-modal .modal-background')
+        .addEventListener('click', UX.collapseFeaturedModal)
+};
+
+UX.localInit = function() {
     initPageTitle();
     initOverviewMenu();
     initTerrainSwitcher();
-    initGameBoard('self-main-board');
+    UX.initGameBoard('self-main-board');
     initGoldCoinTracker();
     initScoreCards();
     initBoardSwitcher();
     initFeaturedModal();
+    initResetButton();
 };
 
-methods.buildMainDom = function() {
-    var mainBoard = methods.buildGameBoard();
+UX.buildMainDom = function() {
+    var mainBoard = UX.buildGameBoard();
     mainBoard.setAttribute('id', 'self-main-board');
     document.getElementById('board-location').appendChild(mainBoard);
     buildScoreSection(document.getElementById('score-cards-section'));

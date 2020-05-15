@@ -343,4 +343,3 @@ var ISpin =
   return ISpin;
 
 })));
-//# sourceMappingURL=ispin.js.map

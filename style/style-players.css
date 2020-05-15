@@ -44,7 +44,7 @@
     display: flex;
 }
 
-.game-container-controls {
+.game-container-footer {
     width: 100%;
     height: 3vw;
     border: solid rgb(180, 180, 180);
@@ -54,7 +54,7 @@
     transition: opacity 300ms;
 }
 
-.game-container-controls-inner {
+.game-container-footer-inner {
     width: 93vw;
     display: flex;
     height: 3vw;
@@ -62,43 +62,43 @@
     justify-content: space-between;
 }
 
-.game-container-controls .info,
-.game-container-controls .buttons {
+.game-container-footer .info,
+.game-container-footer .buttons {
     color: rgb(70, 70, 70);
     font-size: 1.7vw;
     display: flex;
     font-family: sans-serif;
 }
 
-.game-container-controls .info {
+.game-container-footer .info {
     padding: 0.2vw 2vw 0 3.4vw;
 }
 
-.game-container-controls .buttons {
+.game-container-footer .buttons {
     padding: 0 0 0 2vw;
 }
 
-.game-container-controls .info > div {
+.game-container-footer .info > div {
     padding: 0.4vw 2vw 0 2vw;
 }
 
-.game-container-controls .info .label {
+.game-container-footer .info .label {
     font-size: 0.7em;
     padding: 0 1vw 0 0;
     text-transform: uppercase;
     opacity: 0.4;
 }
 
-.game-container-controls .info .data {
+.game-container-footer .info .data {
     padding: 0 1vw 0 0;
 }
 
-.game-container-controls .buttons {
+.game-container-footer .buttons {
     justify-content: right;
 }
 
-.game-container-controls .expand-button,
-.game-container-controls .collapse-button {
+.game-container-footer .expand-button,
+.game-container-footer .collapse-button {
     background-image: url(../images/chevrons-down.svg);
     background-size: 2.4vw 2.4vw;
     background-repeat: no-repeat;
@@ -114,25 +114,25 @@
     margin: -0.3vw 0 0 0;
 }
 
-.game-container-controls .collapse-button {
+.game-container-footer .collapse-button {
     background-image: url(../images/chevrons-up.svg);
     display: none;
 }
 
-.game-container-controls .expand-button:hover {
+.game-container-footer .expand-button:hover {
     background-color: rgb(255, 246, 160);
     opacity: 1;
     color: rgb(0, 0, 0);
 }
 
-.game-container-controls .collapse-button:hover {
+.game-container-footer .collapse-button:hover {
     background-color: rgb(255, 246, 160);
     opacity: 1;
     color: rgb(0, 0, 0);
 }
 
 
-.network-game-active .game-container-controls {
+.network-game-active .game-container-footer {
     pointer-events: all;
     opacity: 1;
 }
@@ -244,7 +244,12 @@
 }
 
 .opponent-board-wrapper .game-square.monster {
-    background-color: rgb(180, 140, 240);
+    background-color: rgb(80, 80, 140);
+}
+
+.opponent-board-wrapper .game-square.monster::before {
+    background-image: none;
+    display: none;
 }
 
 .opponent-board-wrapper .game-square.mountain {
@@ -321,6 +326,18 @@
     opacity: 0.4;
 }
 
+.opponent-board-wrapper:hover .game-square.monster::before {
+    background-image: url(../images/monster.svg);
+    background-size: 1.5vw 1.4vw;
+    display: inline-block;
+    width: 1.6vw;
+    height: 1.4vw;
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0.2;
+}
 
 
 
@@ -331,8 +348,9 @@
     display: none;
     opacity: 0;
     top: 0;
-    width: 100vw;
-    height: 100vh;
+    right: 0;
+    bottom: 0;
+    left: 0;
     z-index: 80;
     pointer-events: none;
 }
@@ -343,17 +361,21 @@
     right: 0;
     bottom: 0;
     left: 0;
-    background: rgba(250, 250, 250, 0.9);
+    background: rgba(0, 30, 50, 0.9);
     z-index: 10;
     opacity: 0;
     transition: opacity 500ms;
 }
 
 .featured-board-modal .terrain-wrap {
-    width: 80vw;
-    padding: 2vw 4vw 1vw 4vw;
+    width: 14vw;
+    padding: 0;
     opacity: 0;
     transition: opacity 300ms;
+    position: absolute;
+    z-index: 20;
+    top: 6vw;
+    left: 1.6vw;
 }
 
 .featured-board-modal .terrain-wrap .terrain-type {
@@ -363,6 +385,39 @@
 .featured-board-modal .featured-player-location {
     opacity: 0;
     transition: opacity 300ms;
+    position: absolute;
+    top: 1vw;
+    right: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    color: rgb(200, 210, 230);
+    font-size: calc(12px + 2vw);
+}
+
+.featured-player-location .close-me {
+    position: absolute;
+    right: 1.4vw;
+    font-size: calc(12px + 3.4vw);
+    font-family: sans-serif;
+    top: -1.6vw;
+    opacity: 0.2;
+    transform: scale(1, 0.8);
+    line-height: 1;
+    cursor: pointer;
+}
+
+.featured-player-location .close-me:hover {
+    opacity: 1;
+    color: rgb(220, 100, 200);
+}
+
+.featured-board-modal .featured-player-location .label {
+    margin: 0 1vw 0 0;
+}
+
+.featured-board-modal .featured-player-location .featured-player-id {
+    margin: 0 0 0 1vw;
 }
 
 
@@ -372,12 +427,12 @@
 
 .featured-board-frame-background {
     z-index: 16;
-    background: rgb(250, 250, 250);
+    background: rgb(0, 30, 50);
     border-radius: 4px;
     position: absolute;
     top: 9vw;
     right: 6vw;
-    bottom: 6vw;
+    bottom: 0;
     left: 6vw;
     opacity: 0;
     transition: opacity 300ms;
@@ -390,14 +445,21 @@
     position: absolute;
     top: 9vw;
     right: 6vw;
-    bottom: 6vw;
+    bottom: 0;
     left: 6vw;
 }
 
 .featured-board-location {
     transform: scale(0.8);
+    position: absolute;
+    top: 0;
+    bottom: 0;
 }
 
+.translate-arrived .featured-board-location {
+    overflow-y: auto;
+    overflow-x: visible;
+}
 
 .featured-board-modal .board-wrap {
     transform-origin: 0 0; 
@@ -441,7 +503,190 @@
 }
 
 
+body.network-game-active.network-game-open {
+    overflow: hidden;
+}
 
+/* ============= TOAST MESSAGES =============================== */
+
+#suc {
+    background: green;
+}
+
+#info {
+    background: blue;
+}
+
+#warn {
+    background: orange;
+}
+
+#err {
+    background: red;
+}
+
+.btn {
+    font-family: "helvetica neue";
+    font-weight: 100;
+    letter-spacing: 2px;
+    border-radius: 5px;
+    display: inline-block;
+    padding: 15px 30px;
+    color: white;
+    cursor: pointer;
+}
+
+/* Toast stylings */
+
+/* Entire toast container */
+.toast-container {
+    position: fixed;
+    z-index: 999999999;
+    width: 34vw;
+}
+ 
+
+/* Each toast gets this style */
+.toast {
+    width: 34vw;
+    font-weight: 200;
+    opacity: 1;
+    position: relative;
+    right: 0;
+    color: white;
+    background: rgba(50,50,50,.9);
+    padding: 1vw 2vw 1vw 3vw;
+    margin-bottom: 8px;
+    border-radius: 3px;
+    transition: .3s all ease;
+    font-family: sans-serif;
+}
+
+.toast .close-me {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 4.4vw;
+    height: 4.2vw;
+    cursor: pointer;
+    color: rgba(250, 250, 250, 0.3);
+    font-weight: bold;
+    font-size: 2.6vw;
+    line-height: 1;
+    padding: 1.4vw 1vw 0 0.6vw;
+    text-transform: uppercase;
+    transform: scale(1, 0.8);
+}
+
+.toast .close-me:hover {
+    color: rgba(255, 200, 240, 1);
+}
+
+.join-table {
+    font-family: sans-serif;
+    font-size: calc(12px + 1.4vw);
+    letter-spacing: 0.01em;
+}
+
+.join-table .title {
+    text-transform: uppercase;
+    font-size: 0.6em;
+    font-weight: bold;
+    color: rgb(140, 100, 180);
+    padding: 0.6vw 0 1.4vw 1vw;
+    letter-spacing: 0;
+}
+
+.join-table .joiner {
+    margin: 0 -3vw 0.5vw -2vw;
+    padding: 1vw 6vw 1vw 2.6vw;
+    cursor: pointer;
+    color: rgba(250, 250, 250, 0.6);
+    position: relative;
+}
+
+.join-table .check {
+    background-image: url(../images/check-circle.svg);
+    color: rgb(250, 250, 250);
+    background-size: 2.4vw 2.4vw;
+    position: absolute;
+    display: none;
+    top: 1.4vw;
+    right: 3.1vw;
+    width: 2.4vw;
+    height: 2.4vw;
+    opacity: 1;
+}
+
+.join-table .joiner:hover {
+    background: rgba(250, 250, 250, 0.1);
+    color: rgba(250, 250, 250, 1);
+}
+
+.join-table .joiner:hover .check {
+    display: block;
+}
+
+.join-table .joiner.pending {
+    pointer-events: none;
+}
+
+
+.join-table .joiner.pending .check {
+    background-image: url(../images/more-horizontal.svg);
+    display: block;
+    opacity: 0.7;
+
+    -webkit-transition-property: -webkit-transform;
+    -moz-transition-property: -moz-transform;
+    -o-transition-property: -o-transform;
+     transition-property: transform;
+
+     overflow:hidden;
+    -webkit-animation:spin 2s linear infinite;
+    -moz-animation:spin 2s linear infinite;
+    animation:spin 2s linear infinite;
+}
+
+.toast.toast-exit {
+    transition: .4s all ease;
+    transform: translate3d(0,0,0);
+    right: -300px;
+    opacity: 0;
+}
+
+/* Successful toast class */
+.toast-success {
+    background: rgba(126,211,33,.9);
+    box-shadow: 0 5px 15px rgba(126,211,33,.5);
+}
+
+.toast-info {
+    background: rgba(130,0,150, 0.98);
+    box-shadow: -14px 14px 36px rgba(0, 0, 0, 0.2);
+    border: solid 1px rgb(170, 70, 180);
+}
+
+/* Error toast class */
+.toast-error {
+    background: rgba(50,0,50,0.95);
+    box-shadow: -14px 14px 36px rgba(0, 0, 0, 0.3);
+    border: solid 1px rgb(200, 200, 200);
+    font-size: calc(12px + 0.7vw);
+    min-height: 10vw;
+    padding-bottom: 3.4vw;
+}
+
+.toast-error .game-id {
+    color: rgb(210, 140, 250);
+    font-size: 1.2em;
+}
+
+/* Warn toast class */
+.toast-warn {
+    background: rgba(245,166,35,.9);
+    box-shadow: 0 5px 15px rgba(245,166,35,.5);
+}
 
 
 

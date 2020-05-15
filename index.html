@@ -2,30 +2,30 @@
 <html lang="en">
 <!--
 
-    TODO -- Test methods.cancelPendingJoinUX();
-    TODO -- Create methods.network.cancelPendingJoin(); -- is this identical to network.exitGame() ?
+    XX  TODO -- Test methods.cancelPendingJoinUX();
+    XX  TODO -- Create methods.network.cancelPendingJoin(); 
+             -- identical to network.exitGame
 
-    TODO -- Create methods.exitGameUX();
-    TODO -- Create methods.network.exitGame();
+    XX  TODO -- Create methods.exitGameUX();
+    XX  TODO -- Create methods.network.exitGame();
 
-    TODO -- Test the create-my-own-game pathways
+    XX  TODO -- Test the create-my-own-game pathways
     
-    TODO -- Build a UX for the approveJoiners() interactions
-    TODO -- Build out the onJoinersChange() method
+    XX  TODO -- Get a Second player going in another browser
+    XX  TODO -- Test latency on board updates
 
-    TODO -- Get a Second player going in another browser
-    TODO -- Test latency on board updates
+    XX  TODO -- Hook up the monster button to the featured board
+    XX  TODO -- Test the update-the-opponent network method
+    XX  TODO -- Style the featured board
 
-    TODO -- Hook up the monster button to the featured board
-    TODO -- Test the update-the-opponent network method
-    TODO -- Style the featured board
+    XX  TODO -- Build a you-have-left toaster type message
+    
+    XX  TODO -- Build a UX for the approveJoiners() interactions
+    XX  TODO -- Build out the onJoinersChange() method
 
     TODO -- Make a boot-the-player button, hook it up
     TODO -- Create the network boot-the-player method
-    TODO -- Build a you-have-left toaster type message
-    
     TODO -- Consider showing a score for each opponent
-
  -->
 
 <head>
@@ -36,8 +36,13 @@
     <script type="text/javascript">
         window.DEBUG = true;
     </script>
+    <script defer type="text/javascript" src="js/nano.js"></script>
     <script defer type="text/javascript" src="js/ispin.js"></script>
+    <script defer type="text/javascript" src="js/tostada.js"></script>
+	<!--OPTIONS  https://codeseven.github.io/toastr/demo.html  -->
     <script defer type="text/javascript" src="js/app-local.js"></script>
+    <script defer type="text/javascript" src="js/app-opponents.js"></script>
+    <script defer type="text/javascript" src="js/app-db.js"></script>
     <script defer type="text/javascript" src="js/app.js"></script>
 </head>
 
@@ -65,6 +70,7 @@
             <div class="terrain-wrap"></div>
             
             <div class="featured-player-location">
+                <div class="close-me">x</div>
                 <div class="label">Player:</div>
                 <div class="featured-player-id" id="featured-player-target"></div>
             </div>
@@ -146,10 +152,11 @@
                             <div class="join-button"  id="game-exit">Leave Game</div>
                         </div>
 
-                        <div class="create-new-game">
+                        <div class="create-new-game" id="create-new-game-A">
                             <div class="message">
-                                "<span class="message-game-id" id="message-new-game-id"></span>" 
-                                is a new game.
+                                The game
+                                "<span class="game-id" id="message-new-game-id"></span>" 
+                                will be a new game.
                                 <br /><br />
                                 Use game board A or B?
                             </div>
